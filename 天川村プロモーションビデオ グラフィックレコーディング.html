@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<!-- saved from url=(0044)file:///Users/kazushi15/Downloads/index.html -->
+<html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>天川村プロモーションビデオ グラフィックレコーディング</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Kaisei+Decol&family=Yomogi&family=Zen+Kurenaido&display=swap');
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+    :root {
+      --color-1: #A61B40;
+      --color-2: #DCE0F2;
+      --color-3: #012840;
+      --color-4: #A66A5D;
+      --color-5: #0D0D0D;
+    }
+
+    body {
+      background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h100v100H0z" fill="none"/><path d="M0 10h100M10 0v100" stroke="%23e0e0e0" stroke-width="0.5" stroke-dasharray="2,3"/></svg>');
+      background-size: 30px 30px;
+      background-color: #f9f7f1;
+      overflow-x: hidden;
+      font-family: 'Zen Kurenaido', sans-serif;
+      color: var(--color-5);
+      line-height: 1.4;
+    }
+
+    .container {
+      max-width: 2000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .title {
+      font-family: 'Kaisei Decol', serif;
+      font-size: 32px;
+      font-weight: bold;
+      text-align: center;
+      margin: 30px 0;
+      background: linear-gradient(45deg, var(--color-1), var(--color-3));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .subtitle {
+      font-family: 'Yomogi', cursive;
+      font-size: 16px;
+      color: #475569;
+      text-align: center;
+      margin-bottom: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 30px;
+    }
+
+    .card {
+      background-color: transparent;
+      padding: 15px;
+      border-radius: 15px;
+      position: relative;
+      margin-bottom: 40px;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .section-heading {
+      font-family: 'Kaisei Decol', serif;
+      font-size: 18px;
+      color: var(--color-3);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-heading i {
+      animation: pulse 2s infinite;
+    }
+
+    .icon-large {
+      font-size: 70px;
+      display: block;
+      margin: 15px auto;
+      text-align: center;
+      color: var(--color-1);
+    }
+
+    .content {
+      font-family: 'Zen Kurenaido', sans-serif;
+      font-size: 14px;
+      color: #334155;
+    }
+
+    .speech-bubble {
+      position: relative;
+      background-color: rgba(220, 224, 242, 0.3);
+      border-radius: 15px;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px dashed rgba(1, 40, 64, 0.2);
+    }
+
+    .speech-bubble:after {
+      content: '';
+      position: absolute;
+      left: 20px;
+      bottom: -15px;
+      border-width: 15px 15px 0;
+      border-style: solid;
+      border-color: rgba(220, 224, 242, 0.3) transparent;
+    }
+
+    .keyword {
+      font-weight: bold;
+      color: var(--color-1);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .highlight-box {
+      border-left: 3px solid var(--color-4);
+      padding-left: 10px;
+      background-color: transparent;
+      margin: 10px 0;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .time-tag {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 5px;
+      text-align: right;
+      font-family: 'Yomogi', cursive;
+    }
+
+    .footer {
+      font-family: 'Yomogi', cursive;
+      font-size: 12px;
+      color: #64748b;
+      text-align: center;
+      margin-top: 60px;
+      padding: 20px;
+      border-top: 1px dashed #e2e8f0;
+    }
+
+    /* レスポンシブデザイン */
+    @media (max-width: 1600px) {
+      .grid-container {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .grid-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .grid-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .emoji-large {
+      font-size: 70px;
+      text-align: center;
+      display: block;
+      margin: 15px auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="title"><i class="fa-solid fa-dragon"></i> 天川村プロモーションビデオ <i class="fa-solid fa-mountain-sun"></i></h1>
+    <p class="subtitle"><i class="fa-solid fa-film"></i> 都会の女性と龍の不思議な旅 <i class="fa-solid fa-clock"></i></p>
+
+    <div class="grid-container">
+      <!-- 1. 都会の喧騒と疲労 -->
+      <div class="card">
+        <h2 class="section-heading"><i class="fa-solid fa-city"></i> 都会の喧騒と疲労</h2>
+        <div class="emoji-large">😩</div>
+        <div class="content">
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-hourglass-end"></i> 女性：</span>「また、間に合わなかった...」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-repeat"></i> 女性：</span>「毎⽇、同じ繰り返し...」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-wind"></i> 女性：</span>（深いため息）「少し、休みたい...」
+          </div>
+          <div class="highlight-box">
+            <i class="fa-solid fa-exclamation-circle"></i> 都会の疲れた女性の日常
+          </div>
+          <p class="time-tag">0:00-0:05</p>
+        </div>
+      </div>
+
+      <!-- 2. スマホと⿓の出現 -->
+      <div class="card">
+        <h2 class="section-heading"><i class="fa-solid fa-mobile-screen"></i> スマホと⿓の出現</h2>
+        <i class="fa-solid fa-dragon icon-large"></i>
+        <div class="content">
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-dragon"></i> ⿓：</span>「疲れているようだね。」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-face-surprise"></i> ⼥性：</span>「え？何これ...スマホから出てきた？」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-dragon"></i> ⿓：</span>「美しい場所へ連れて⾏こう。⼼が癒される場所があるんだ。」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-question"></i> ⼥性：</span>「どこへ？どうやって？」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-eye-slash"></i> ⿓：</span>「⽬を閉じて。すぐにわかるから。」
+          </div>
+          <div class="highlight-box">
+            <i class="fa-solid fa-magic"></i> ファンタジー要素の導入
+          </div>
+          <p class="time-tag">0:05-0:10</p>
+        </div>
+      </div>
+
+      <!-- 3. 変⾝と⾶⾏ -->
+      <div class="card">
+        <h2 class="section-heading"><i class="fa-solid fa-wind"></i> 変⾝と⾶⾏</h2>
+        <i class="fa-solid fa-person-through-window icon-large"></i>
+        <div class="content">
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-surprise"></i> ⼥性：</span>「わっ！」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-face-surprise"></i> ⼥性：</span>「す、すごい...空を⾶んでる！」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-mountain"></i> ⼥性：</span>「こんな景⾊、⾒たことない...」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-cherry-blossom"></i> ⼥性：</span>「あれは...桜？こんなにたくさん！」
+          </div>
+          <div class="highlight-box">
+            <i class="fa-solid fa-feather"></i> 現実から非日常への移行
+          </div>
+          <p class="time-tag">0:10-0:15</p>
+        </div>
+      </div>
+
+      <!-- 4. 天川村到着 -->
+      <div class="card">
+        <h2 class="section-heading"><i class="fa-solid fa-torii-gate"></i> 天川村到着</h2>
+        <div class="emoji-large">🌸</div>
+        <div class="content">
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-map-marker-alt"></i> ⼥性：</span>「ここが...天川村？」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-heart"></i> ⼥性：</span>「なんて美しい場所...」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-wind"></i> ⼥性：</span>「空気が違う...都会とは全然違う」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-flower"></i> ⼥性：</span>「桜の⾹りがする...」
+          </div>
+          <div class="highlight-box">
+            <i class="fa-solid fa-leaf"></i> 天川村の第一印象
+          </div>
+          <p class="time-tag">0:15-0:20</p>
+        </div>
+      </div>
+
+      <!-- 5. みたらい渓⾕ -->
+      <div class="card">
+        <h2 class="section-heading"><i class="fa-solid fa-water"></i> みたらい渓⾕</h2>
+        <i class="fa-solid fa-water icon-large"></i>
+        <div class="content">
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-droplet"></i> ⼥性：</span>「こんなに透き通った⽔、初めて⾒た...」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-temperature-low"></i> ⼥性：</span>「冷たい！でも...気持ちいい」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-tint"></i> ⼥性：</span>「都会の⽔とは全然違う...⽣きてる感じがする」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-regular fa-clock"></i> ⼥性：</span>「ここにいると...時間がゆっくり流れてる気がする」
+          </div>
+          <div class="highlight-box">
+            <i class="fa-solid fa-leaf"></i> 清らかな水との出会い
+          </div>
+          <p class="time-tag">0:20-0:30</p>
+        </div>
+      </div>
+
+      <!-- 6. ⾯不動鍾乳洞 -->
+      <div class="card">
+        <h2 class="section-heading"><i class="fa-solid fa-mountain-sun"></i> ⾯不動鍾乳洞</h2>
+        <i class="fa-solid fa-train icon-large"></i>
+        <div class="content">
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-train"></i> ⼥性：</span>「このトロッコ、本当に動くの？」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-cave"></i> ⼥性：</span>「わぁ...まるで別世界...」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-hourglass"></i> ⼥性：</span>「これ、何万年もかけてできたのかな...」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-heartbeat"></i> ⼥性：</span>「静かすぎて...⾃分の⼼臓の⾳が聞こえる」
+          </div>
+          <div class="highlight-box">
+            <i class="fa-solid fa-exclamation"></i> 自然が作り出した神秘との対面
+          </div>
+          <p class="time-tag">0:30-0:40</p>
+        </div>
+      </div>
+
+      <!-- 7. 天河神社 -->
+      <div class="card">
+        <h2 class="section-heading"><i class="fa-solid fa-torii-gate"></i> 天河神社</h2>
+        <i class="fa-solid fa-pray icon-large"></i>
+        <div class="content">
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-pray"></i> ⼥性：</span>「なんだか...神聖な場所に来た感じがする」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-tree"></i> ⼥性：</span>「この⽊、何百年も前からここにあるのかな...」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-hands-praying"></i> ⼥性：</span>（祈りながら）「⼼が...静かになっていく」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-city"></i> ⼥性：</span>「不思議...都会の喧騒が遠い記憶のように感じる」
+          </div>
+          <div class="highlight-box">
+            <i class="fa-solid fa-star"></i> 精神的な浄化と平穏
+          </div>
+          <p class="time-tag">0:40-0:50</p>
+        </div>
+      </div>
+
+      <!-- 8. 洞川温泉旅館街（夜） -->
+      <div class="card">
+        <h2 class="section-heading"><i class="fa-solid fa-hot-tub"></i> 洞川温泉旅館街</h2>
+        <i class="fa-solid fa-spa icon-large"></i>
+        <div class="content">
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-bath"></i> ⼥性：</span>「温泉の⾹り...なんだか懐かしい」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-star"></i> ⼥性：</span>「こんな星空、東京じゃ絶対に⾒られない」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-temperature-high"></i> ⼥性：</span>「⼼も体も...温かくなっていく」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-hands-heart"></i> ⼥性：</span>「こんな素敵な場所に連れてきてくれてありがとう」
+          </div>
+          <div class="highlight-box">
+            <i class="fa-solid fa-moon"></i> 夜の癒しと感謝
+          </div>
+          <p class="time-tag">0:50-1:00</p>
+        </div>
+      </div>
+
+      <!-- 9. 星空と桜 -->
+      <div class="card">
+        <h2 class="section-heading"><i class="fa-solid fa-moon"></i> 星空と桜</h2>
+        <div class="emoji-large">✨</div>
+        <div class="content">
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-cherry-blossom"></i> ⼥性：</span>「あれは...桜の花びら？どうして空から...」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-sparkles"></i> ⼥性：</span>「きれい...まるで星のよう」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-door-open"></i> ⼥性：</span>「もう、帰らなきゃいけないの？」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-hourglass-end"></i> ⼥性：</span>「この旅は...終わってしまうの？」
+          </div>
+          <div class="highlight-box">
+            <i class="fa-solid fa-feather"></i> 幻想的な別れの時
+          </div>
+          <p class="time-tag">1:00-1:05</p>
+        </div>
+      </div>
+
+      <!-- 10. 部屋に戻る -->
+      <div class="card">
+        <h2 class="section-heading"><i class="fa-solid fa-bed"></i> 部屋に戻る</h2>
+        <i class="fa-solid fa-house icon-large"></i>
+        <div class="content">
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-question"></i> ⼥性：</span>「あれ...私の部屋？」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-cloud-moon"></i> ⼥性：</span>「夢だったの？でも、あんなに鮮明で...」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-hand-holding"></i> ⼥性：</span>（⼿のひらを⾒て）「これは...」
+          </div>
+          <div class="highlight-box">
+            <i class="fa-solid fa-question-circle"></i> 現実との境界
+          </div>
+          <p class="time-tag">1:05-1:10</p>
+        </div>
+      </div>
+
+      <!-- 11. 決意と希望 -->
+      <div class="card">
+        <h2 class="section-heading"><i class="fa-solid fa-sun"></i> 決意と希望</h2>
+        <i class="fa-solid fa-mountain icon-large"></i>
+        <div class="content">
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-lightbulb"></i> ⼥性：</span>「夢じゃなかった...」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-map-location"></i> ⼥性：</span>「あの場所は、本当にあるんだ」
+          </div>
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-hiking"></i> ⼥性：</span>「今度は、本当に⾏ってみよう...天川村へ」
+          </div>
+          <div class="highlight-box">
+            <i class="fa-solid fa-heart"></i> 新たな旅への決意
+          </div>
+          <p class="time-tag">1:10-1:15</p>
+        </div>
+      </div>
+
+      <!-- 12. エンディング -->
+      <div class="card">
+        <h2 class="section-heading"><i class="fa-solid fa-film"></i> エンディング</h2>
+        <i class="fa-solid fa-map-marked-alt icon-large"></i>
+        <div class="content">
+          <div class="speech-bubble">
+            <span class="keyword"><i class="fa-solid fa-microphone"></i> ナレーション：</span>「あなたはまだ本物の天川村を知らない」
+          </div>
+          <div class="highlight-box">
+            <i class="fa-solid fa-bullhorn"></i> 視聴者への呼びかけ
+          </div>
+          <p class="time-tag">1:15-1:20</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>天川村プロモーションビデオ グラフィックレコーディング | 作成日: 2025年3月21日 | <i class="fa-solid fa-film"></i> 映像セリフ集より</p>
+    </div>
+  </div>
+
+</body></html>
