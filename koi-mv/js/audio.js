@@ -219,54 +219,79 @@ window.KoiAudio = (() => {
     bass(38, 13.125, 1.8, 1);
     [81, 86, 88, 90, 93].forEach((n, i) => bell(n, 13.2 + i * 0.09, 0.5));
 
-    // ---------------------------------------------------------- station notes
-    const S = cues.stations, NOTE = { fuan: 74, suki: 78, namida: 81, kataomoi: 83, yuuki: 86 };
-    for (const k in S) { bell(NOTE[k], S[k], 1); click(S[k], 1); }
-    // recap: every visited node pulses in turn
-    cues.recap.forEach((t, i) => bell([74, 78, 81, 83, 86][i], t, 0.6));
+    if (cues.making) {
+      // ------------------------------------------------------- making-of cues
+      const M = cues.making, NOTES = [74, 76, 78, 81, 83, 86, 88];
+      [0.15, 0.27, 0.4].forEach((t, i) => { blip(t, 520 - i * 60, 240, 0.1, 0.16, sfx, "triangle"); noiseHit(t, 0.05, "bandpass", 2200, 1, 0.1, sfx); });
+      for (let i = 0; i < 7; i++) click(0.42 + i * 0.06, 0.45);             // overview stations pop
+      sweep(1.2, 0.42, 400, 3200, 0.18);                                     // zoom into the first station
+      M.steps.forEach((t, i) => {
+        bell(NOTES[i], t + 0.05, 0.9); click(t + 0.05, 1);
+        if (i) sweep(t - 0.14, 0.32, 700, 3800, 0.13);                       // camera pans to the next station
+      });
+      const [s1, s2, s3, s4, s5, , s7] = M.steps;
+      sweep(s1 + 0.35, 0.6, 2400, 900, 0.06);                               // scanning the key visual
+      [86, 90, 93].forEach((n, i) => bell(n, s2 + 0.62 + i * 0.05, 0.3));    // green plate appears
+      for (let i = 0; i < 12; i++) noiseHit(s3 + 0.15 + i * 0.045, 0.016, "highpass", 3000, 1, 0.16, sfx); // prompt typing
+      for (let t = s3 + 0.2; t < s3 + 1.5; t += 0.11) noiseHit(t, 0.02, "bandpass", 5200, 2, 0.1, sfx);    // film frames tick past
+      sweep(s4 + 0.25, 0.85, 800, 4800, 0.1);                               // keying scan
+      blip(s4 + 1.12, 900, 1400, 0.08, 0.14);
+      sweep(s5 + 0.08, 0.45, 300, 2600, 0.2);                               // layers explode
+      blip(s5 + 1.42, 160, 70, 0.2, 0.4);                                   // ...and snap back together
+      for (let t = s7 + 0.05; t < s7 + 1.15; t += 0.045) click(t, 0.3);     // frame counter
+      blip(s7 + 1.22, 330, 660, 0.14, 0.25, sfx, "triangle");               // MP4
+      M.recap.forEach((t, i) => bell(NOTES[i], t, 0.5));
+      sweep(M.out - 0.05, 0.4, 900, 5200, 0.18);
+    } else {
+      // ---------------------------------------------------------- station notes
+      const S = cues.stations, NOTE = { fuan: 74, suki: 78, namida: 81, kataomoi: 83, yuuki: 86 };
+      for (const k in S) { bell(NOTE[k], S[k], 1); click(S[k], 1); }
+      // recap: every visited node pulses in turn
+      cues.recap.forEach((t, i) => bell([74, 78, 81, 83, 86][i], t, 0.6));
 
-    // ---------------------------------------------------------- foley
-    sweep(0.05, 1.1, 1500, 700, 0.05);                         // route drawing in
-    for (let i = 0; i < 16; i++) click(0.1 + i * 0.02 + 0.08, 0.35); // copy settles
-    step(cues.land, 1.5); rustle(cues.land, 0.2, 1.4); blip(cues.land, 180, 60, 0.18, 0.35);
-    for (let t = cues.land + BEAT; t < cues.slip; t += BEAT) step(t, 0.9);
-    for (let t = 6.45 + BEAT / 2; t < 8.0; t += BEAT / 2) step(t, 0.7);
-    for (let t = 10.3125 + BEAT; t < 12.7; t += BEAT) step(t, 0.8);
-    for (const t of [2.8, 4.7, 6.9, 10.9, 11.9]) rustle(t, 0.12, 0.6); // cardigan and bag
-    // message: envelope flap, typing, deleting
-    noiseHit(cues.envelope, 0.08, "bandpass", 1400, 1.2, 0.25, sfx, 0.01);
-    const typeN = 23;
-    for (let i = 0; i < typeN; i++) {
-      const t = cues.typeStart + (i * (cues.typeEnd - cues.typeStart)) / typeN;
-      noiseHit(t, 0.018, "highpass", 2500 + rnd() * 1500, 1, 0.22 + rnd() * 0.1, sfx);
+      // ---------------------------------------------------------- foley
+      sweep(0.05, 1.1, 1500, 700, 0.05);                         // route drawing in
+      for (let i = 0; i < 16; i++) click(0.1 + i * 0.02 + 0.08, 0.35); // copy settles
+      step(cues.land, 1.5); rustle(cues.land, 0.2, 1.4); blip(cues.land, 180, 60, 0.18, 0.35);
+      for (let t = cues.land + BEAT; t < cues.slip; t += BEAT) step(t, 0.9);
+      for (let t = 6.45 + BEAT / 2; t < 8.0; t += BEAT / 2) step(t, 0.7);
+      for (let t = 10.3125 + BEAT; t < 12.7; t += BEAT) step(t, 0.8);
+      for (const t of [2.8, 4.7, 6.9, 10.9, 11.9]) rustle(t, 0.12, 0.6); // cardigan and bag
+      // message: envelope flap, typing, deleting
+      noiseHit(cues.envelope, 0.08, "bandpass", 1400, 1.2, 0.25, sfx, 0.01);
+      const typeN = 23;
+      for (let i = 0; i < typeN; i++) {
+        const t = cues.typeStart + (i * (cues.typeEnd - cues.typeStart)) / typeN;
+        noiseHit(t, 0.018, "highpass", 2500 + rnd() * 1500, 1, 0.22 + rnd() * 0.1, sfx);
+      }
+      for (let i = 0; i < 13; i++) {
+        const t = cues.eraseStart + (i * (cues.eraseEnd - cues.eraseStart)) / 13;
+        noiseHit(t, 0.014, "bandpass", 1300, 1.5, 0.2, sfx);
+      }
+      // the cushion slips and floats away
+      sweep(cues.slip, 0.9, 600, 2600, 0.14);
+      blip(cues.slip + 0.05, 330, 660, 0.7, 0.12, sfx, "triangle");
+      blip(6.6, 1400, 620, 0.12, 0.2);                            // the tear lands
+      // catch: soft impact, a little boing, cloth settling
+      blip(cues.catch, 140, 55, 0.22, 0.55);
+      blip(cues.catch + 0.02, 420, 240, 0.16, 0.16, sfx, "triangle");
+      blip(cues.catch + 0.14, 240, 330, 0.16, 0.12, sfx, "triangle");
+      rustle(cues.catch + 0.05, 0.3, 1.2); step(cues.landCatch, 1.2);
+      blip(cues.pulse[0], 900, 1800, cues.pulse[1] - cues.pulse[0], 0.08); // pulse runs to the lyric
+      // 勇気: a tiny phone trill
+      for (let i = 0; i < 8; i++) blip(11.28 + i * 0.045, i % 2 ? 1600 : 1320, i % 2 ? 1600 : 1320, 0.04, 0.05);
+      // motion-graphics accents: word slams, stripe wipes, the burst when the cushion slips
+      for (const b of [1, 1.5, 2]) { const t = 1.875 + b * BEAT; blip(t, 520, 260, 0.09, 0.16, sfx, "triangle"); noiseHit(t, 0.05, "bandpass", 2200, 1, 0.12, sfx); }
+      for (const t of [3.28, 10.18]) sweep(t, 0.42, 900, 5200, 0.2);
+      sweep(5.78, 0.35, 1800, 7000, 0.12);
+      for (let i = 0; i < 5; i++) bell(93 + [0, 2, 4, 7, 9][i], 8.2 + i * 0.05, 0.22); // confetti sparkle
+      // the cushion sweeps across the lens, left to right
+      const w = sweep(cues.sweep[0] - 0.08, cues.sweep[1] - cues.sweep[0] + 0.2, 350, 1800, 0.34, sfx, 0.7);
+      const pan = ctx.createStereoPanner();
+      w.disconnect(); w.connect(pan).connect(sfx);
+      pan.pan.setValueAtTime(-0.9, at(cues.sweep[0] - 0.08)); pan.pan.linearRampToValueAtTime(0.9, at(cues.sweep[1] + 0.1));
+      blip(cues.sweep[0], 90, 60, 0.5, 0.2);
     }
-    for (let i = 0; i < 13; i++) {
-      const t = cues.eraseStart + (i * (cues.eraseEnd - cues.eraseStart)) / 13;
-      noiseHit(t, 0.014, "bandpass", 1300, 1.5, 0.2, sfx);
-    }
-    // the cushion slips and floats away
-    sweep(cues.slip, 0.9, 600, 2600, 0.14);
-    blip(cues.slip + 0.05, 330, 660, 0.7, 0.12, sfx, "triangle");
-    blip(6.6, 1400, 620, 0.12, 0.2);                            // the tear lands
-    // catch: soft impact, a little boing, cloth settling
-    blip(cues.catch, 140, 55, 0.22, 0.55);
-    blip(cues.catch + 0.02, 420, 240, 0.16, 0.16, sfx, "triangle");
-    blip(cues.catch + 0.14, 240, 330, 0.16, 0.12, sfx, "triangle");
-    rustle(cues.catch + 0.05, 0.3, 1.2); step(cues.landCatch, 1.2);
-    blip(cues.pulse[0], 900, 1800, cues.pulse[1] - cues.pulse[0], 0.08); // pulse runs to the lyric
-    // 勇気: a tiny phone trill
-    for (let i = 0; i < 8; i++) blip(11.28 + i * 0.045, i % 2 ? 1600 : 1320, i % 2 ? 1600 : 1320, 0.04, 0.05);
-    // motion-graphics accents: word slams, stripe wipes, the burst when the cushion slips
-    for (const b of [1, 1.5, 2]) { const t = 1.875 + b * BEAT; blip(t, 520, 260, 0.09, 0.16, sfx, "triangle"); noiseHit(t, 0.05, "bandpass", 2200, 1, 0.12, sfx); }
-    for (const t of [3.28, 10.18]) sweep(t, 0.42, 900, 5200, 0.2);
-    sweep(5.78, 0.35, 1800, 7000, 0.12);
-    for (let i = 0; i < 5; i++) bell(93 + [0, 2, 4, 7, 9][i], 8.2 + i * 0.05, 0.22); // confetti sparkle
-    // the cushion sweeps across the lens, left to right
-    const w = sweep(cues.sweep[0] - 0.08, cues.sweep[1] - cues.sweep[0] + 0.2, 350, 1800, 0.34, sfx, 0.7);
-    const pan = ctx.createStereoPanner();
-    w.disconnect(); w.connect(pan).connect(sfx);
-    pan.pan.setValueAtTime(-0.9, at(cues.sweep[0] - 0.08)); pan.pan.linearRampToValueAtTime(0.9, at(cues.sweep[1] + 0.1));
-    blip(cues.sweep[0], 90, 60, 0.5, 0.2);
   }
 
   function impulse(ctx, secs) {

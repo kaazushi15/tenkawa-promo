@@ -18,7 +18,7 @@ fs.mkdirSync(path.dirname(out), { recursive: true });
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
 page.on("pageerror", (e) => console.error("[pageerror]", e.message));
-await page.goto(pathToFileURL(path.join(root, "index.html")).href + "?render" + (process.env.CLIP ? "&clip=" + process.env.CLIP : ""));
+await page.goto(pathToFileURL(path.join(root, process.env.PAGE || "index.html")).href + "?render" + (process.env.CLIP ? "&clip=" + process.env.CLIP : ""));
 const dur = await page.evaluate(async () => { await window.MV.ready; return window.MV.DUR; });
 
 // soundtrack → 16-bit WAV

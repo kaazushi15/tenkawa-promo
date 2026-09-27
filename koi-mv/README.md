@@ -8,6 +8,26 @@ HTML / CSS / JavaScript だけで組んだ 15 秒のリリックビデオです�
 
 - 完成動画: `dist/koi-no-tabi.mp4`（1920×1080 / 30fps / 15.0秒 / AAC 48kHz、約 -13.5 LUFS）
 - ブラウザで見る: `index.html` を開いてクリック（またはスペースキー）で再生
+- メイキング: `dist/making-of.mp4` / `making.html`（同じテイストの15秒「HOW IT'S MADE」）
+
+## メイキング（making.html）
+
+制作の工程を路線図の7駅に見立て、カメラが駅から駅へ進みながら、実際の制作素材で各工程を見せます。
+
+| 時刻 | 駅 | 見せ方 | ツール |
+| --- | --- | --- | --- |
+| 0.0–1.4 | 全体 | タイトルと7駅の路線図 → 1駅目へズーム | |
+| 1.4 | 01 原画 | キービジュアルが落ちてきてスキャン、少女に丸 | キービジュアル 1枚 |
+| 3.0 | 02 緑背景 | 原画 → 緑背景のキャラへ円形に切り替わる | Seedream |
+| 4.6 | 03 動かす | プロンプトの吹き出し＋実際のコマが流れるフィルム | Kling 3.0 |
+| 6.2 | 04 切り抜く | 走査線の左が透明（市松模様）に、マスクも表示 | Python / ffmpeg |
+| 7.8 | 05 組み立て | 本編の実レイヤー5枚が3Dで分解→1枚に戻る、render(t) のコード | HTML / CSS / JavaScript |
+| 9.4 | 06 音 | 実際の編曲どおりのピアノロールと 128BPM | Web Audio API |
+| 11.0 | 07 書き出し | 0→450 のフレームカウンター、コマが積まれて MP4 に | Playwright / ffmpeg |
+| 12.6–15.0 | 完成 | 全駅が点灯、完成版 MV の早回し再生、ツール一覧 | |
+
+素材は `tools/making_assets.py`（キービジュアル・Kling 映像・切り抜き・完成版のコマ）と
+`tools/layers.mjs`（本編を透過レイヤー5枚に分けて撮影）で作っています。
 
 歌詞・テキストはキービジュアルに書かれているものだけを使っています
 （「まだ、伝えられない」「ねぇ、気づいてくれてる?」「目が合うたびに、胸が痛くて」「この恋が届くその日まで、」
@@ -31,6 +51,8 @@ HTML / CSS / JavaScript だけで組んだ 15 秒のリリックビデオです�
 index.html        舞台の骨組み（SVG シンボル：ハート、アイコン）
 css/mv.css        レイアウトとタイポグラフィ
 js/mv.js          カメラ・キャラクター・駅・歌詞・エンドカードを render(t) で描画
+js/typo.js        文字を1字ずつ動かすエンジン（本編とメイキングで共用）
+js/making.js      メイキング本体
 js/kinetic.js     キネティック・タイポグラフィ（歌詞の出入り、縦書き、円形テキスト、路線上を走る文字、
                   テロップ、アウトライン文字の帯、ワイプ、放射線、紙吹雪、ビート連動の図形）
 js/audio.js       WebAudio による BGM（128BPM、D メジャー）と効果音、オフライン書き出し
@@ -39,7 +61,8 @@ clips/            切り抜き済みのキャラクター映像（kling15.webm�
 fonts/            Zen Maru Gothic / Nunito（使用文字だけのサブセット）
 tools/cutout.py   原画から少女・ハートなし版・袖レイヤーを切り出す
 tools/key_clips.py 緑背景の映像からキャラクターを切り抜き、透過 WebM と位置情報を書き出す
-tools/render.mjs  MP4 書き出し（Playwright + ffmpeg）
+tools/render.mjs  MP4 書き出し（Playwright + ffmpeg、PAGE=making.html でメイキング）
+tools/fonts.py    画面に出る全文字から Google Fonts のサブセットを作り直す
 tools/stills.mjs  任意の時刻の静止画を書き出す
 ```
 
@@ -54,4 +77,5 @@ pip install pillow numpy scipy # 切り出しをやり直す場合のみ
 python3 tools/cutout.py        # 素材の再生成（任意）
 python3 tools/key_clips.py kling15   # clips/kling15.src.mp4 を置いてから実行すると切り抜きをやり直せる
 NODE_PATH=$(npm root -g) node tools/render.mjs dist/koi-no-tabi.mp4   # ffmpeg が必要（FFMPEG で場所を指定可）
+PAGE=making.html NODE_PATH=$(npm root -g) node tools/render.mjs dist/making-of.mp4
 ```

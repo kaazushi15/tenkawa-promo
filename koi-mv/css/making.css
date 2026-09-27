@@ -1,0 +1,99 @@
+/* HOW IT'S MADE — the making-of, drawn in the MV's own vocabulary (mv.css is loaded first). */
+@font-face { font-family: "DM Mono"; font-weight: 500; font-display: block; src: url("../fonts/dmmono-500.woff2") format("woff2"); }
+
+:root { --mono: "DM Mono", ui-monospace, monospace; --navy: #1b1b25; }
+
+#world { transform-origin: 0 0; }
+#world .station { white-space: nowrap; }
+.panel { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+
+/* tool chips and small pills */
+.chip {
+  position: absolute; padding: 11px 22px 10px; border-radius: 999px; white-space: nowrap;
+  background: var(--white); color: var(--lime-text); font: 900 25px/1 var(--en); letter-spacing: 0.05em;
+  box-shadow: 0 6px 0 rgba(20, 70, 0, 0.18);
+}
+.chiprow { position: absolute; display: flex; gap: 14px; }
+.chiprow .chip { position: relative; }
+.chip.jp { font-family: var(--jp); letter-spacing: 0.04em; }
+.chip.pink { background: var(--pink); color: var(--white); }
+.pill {
+  position: absolute; padding: 7px 14px 6px; border-radius: 10px; white-space: nowrap;
+  background: var(--pink); color: var(--white); font: 900 19px/1 var(--jp); letter-spacing: 0.08em;
+}
+.pill.en { font-family: var(--en); letter-spacing: 0.14em; }
+.pill.white { background: var(--white); color: var(--lime-text); }
+
+/* step headings drawn by the type engine */
+.ky.outline .line { color: transparent; -webkit-text-stroke: 4px var(--white); }
+
+/* cards */
+.card {
+  position: absolute; border-radius: 20px; overflow: hidden; background: var(--white);
+  box-shadow: 0 0 0 6px var(--white), 0 22px 44px rgba(20, 70, 0, 0.28);
+}
+.card img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+.checker { position: absolute; inset: 0; background: repeating-conic-gradient(#e6e8e1 0 25%, #ffffff 0 50%) 0 0 / 36px 36px; }
+.scan { position: absolute; background: var(--white); box-shadow: 0 0 22px 8px rgba(255, 255, 255, 0.8); border-radius: 4px; }
+.crop { position: absolute; width: 46px; height: 46px; border: 0 solid var(--white); }
+
+/* prompt bubble */
+.bubble {
+  position: absolute; padding: 26px 32px; border-radius: 26px; background: var(--white); color: var(--lime-text);
+  font: 900 34px/1.45 var(--jp); letter-spacing: 0.04em; white-space: pre; box-shadow: 0 16px 34px rgba(20, 70, 0, 0.22);
+}
+.bubble::after {
+  content: ""; position: absolute; left: 70px; bottom: -22px; border: 14px solid transparent;
+  border-top: 16px solid var(--white); border-left: 18px solid var(--white);
+}
+.bubble .caret { display: inline-block; width: 4px; height: 36px; background: var(--pink); vertical-align: -6px; margin-left: 2px; }
+
+/* film strip */
+.film { position: absolute; border-radius: 18px; background: var(--navy); overflow: hidden; box-shadow: 0 22px 44px rgba(20, 70, 0, 0.3); }
+.film .holes { position: absolute; left: 0; right: 0; height: 26px; background: repeating-linear-gradient(90deg, transparent 0 18px, #fdfdf8 18px 44px, transparent 44px 62px); background-clip: content-box; padding: 7px 0; opacity: 0.9; }
+.film .track { position: absolute; left: 0; top: 52px; height: 225px; }
+.film .track img { position: absolute; top: 0; width: 400px; height: 225px; border-radius: 8px; }
+
+/* compose: exploded layers */
+.scene3d { position: absolute; perspective: 2400px; }
+.stack { position: absolute; left: 80px; top: 120px; width: 880px; height: 495px; transform-style: preserve-3d; }
+.plane { position: absolute; inset: 0; transform-style: preserve-3d; border-radius: 10px; background: rgba(253, 253, 248, 0.14); }
+.plane img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 10px; }
+.plane .frame { position: absolute; inset: 0; border: 4px solid rgba(253, 253, 248, 0.9); border-radius: 10px; }
+.plane .pill { left: calc(100% + 26px); top: 38%; font-size: 30px; padding: 10px 20px 9px; }
+.code {
+  position: absolute; padding: 22px 26px; border-radius: 18px; background: var(--navy); color: #eef3e4;
+  font: 500 20px/1.5 var(--mono); white-space: pre; box-shadow: 0 16px 34px rgba(20, 70, 0, 0.25);
+}
+.code .kw { color: var(--pink); }
+.code .fn { color: #b6ec72; }
+.code .by { position: absolute; right: 16px; top: -18px; }
+
+/* sound: piano roll */
+.roll { position: absolute; border-radius: 24px; background: rgba(18, 70, 0, 0.3); border: 4px solid var(--white); overflow: hidden; }
+.roll .lane { position: absolute; left: 0; right: 0; height: 104px; border-top: 2px dashed rgba(253, 253, 248, 0.35); }
+.roll .lane b { position: absolute; left: 22px; top: 38px; font: 900 20px/1 var(--en); letter-spacing: 0.16em; z-index: 2; }
+.roll .track { position: absolute; left: 0; top: 0; height: 100%; }
+.roll .note { position: absolute; border-radius: 6px; background: var(--white); }
+.roll .note.on { background: var(--pink); box-shadow: 0 0 14px 4px rgba(251, 108, 120, 0.7); }
+.roll .head { position: absolute; top: 0; bottom: 0; width: 6px; background: var(--pink); box-shadow: 0 0 18px 4px rgba(251, 108, 120, 0.6); }
+.eq { position: absolute; width: 22px; border-radius: 6px 6px 3px 3px; background: var(--white); transform-origin: 50% 100%; }
+
+/* export */
+.counter { position: absolute; font: 500 150px/1 var(--mono); letter-spacing: 0.02em; }
+.counter small { display: block; margin-top: 10px; font: 900 28px/1 var(--en); letter-spacing: 0.24em; }
+.thumb { position: absolute; width: 360px; height: 203px; border-radius: 12px; box-shadow: 0 0 0 5px var(--white), 0 14px 28px rgba(20, 70, 0, 0.3); }
+.file {
+  position: absolute; width: 300px; height: 370px; border-radius: 22px 70px 22px 22px; background: var(--white);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  box-shadow: 0 22px 44px rgba(20, 70, 0, 0.3);
+}
+.file b { font: 900 96px/1 var(--en); color: var(--pink); letter-spacing: 0.02em; }
+.file svg { width: 92px; height: 70px; }
+.spec { position: absolute; font: 900 26px/1 var(--en); letter-spacing: 0.16em; white-space: nowrap; }
+
+/* outro */
+.player { position: absolute; }
+.player .card { inset: 0; }
+.toolname { position: absolute; transform: translateX(-50%); font: 900 17px/1 var(--en); letter-spacing: 0.06em; white-space: nowrap; }
+.bignum { position: absolute; font: 900 760px/1 var(--en); color: transparent; -webkit-text-stroke: 5px rgba(253, 253, 248, 0.22); letter-spacing: -0.04em; }
