@@ -125,6 +125,15 @@
     return i >= 15000 ? CAM[15000] : lerp(CAM[i], CAM[i + 1], f - i);
   };
 
+  // ---------------------------------------------------------------- character footage
+  // A keyed Kling clip (clips/<name>.js, written by tools/key_clips.py) replaces the
+  // cut-out sprites when it is present. ?clip=<name> picks another take.
+  const CLIP_NAME = new URLSearchParams(location.search).get("clip") || "kling15";
+  const CLIP = (window.KOI_CLIPS || {})[CLIP_NAME] || null;
+  const VS = CLIP ? 760 / CLIP.height : 1; // clip px → stage px
+  // story time → clip time; retime the footage against the cues here
+  const clipTime = keys((CLIP && CLIP.sync) || [[1.4, 0], [1.87, 0.55], [5.8, 4.5], [8.15, 7.25], [10.3, 9.5], [13.4, 12.6]]);
+
   // ---------------------------------------------------------------- character
   const girlX = keys([[0, 2380], [1.4, 2380], [1.87, 1480], [2.2, 1466, E.out], [5.8, 1330],
     [6.25, 1326, E.out], [6.45, 1305, E.io], [8.0, 860], [8.35, 700], [8.75, 668, E.out],
@@ -132,6 +141,10 @@
 
   function pose(t) {
     let x = girlX(t), y = 0, rot = 0, sx = 1, sy = 1;
+    if (CLIP) { // the footage carries her body motion; only the leap in is ours
+      if (t < 1.87) { const u = clamp((t - 1.4) / 0.47); y = -(1 - u) * (0.45 + u) * 300; rot = lerp(-8, 0, u); }
+      return { x, y, rot, sx, sy, hug: true };
+    }
     if (t < 1.87) { // leaps in from the right edge
       const u = clamp((t - 1.4) / 0.47);
       y = -(1 - u) * (0.45 + u) * 300;
@@ -172,7 +185,15 @@
     return { x: p.x + dx * Math.cos(r) - dy * Math.sin(r), y: FEET_Y + p.y + dx * Math.sin(r) + dy * Math.cos(r), rot: HEART.rot + p.rot };
   }
   const A_SLIP = attach(pose(CUES.slip)), A_CATCH = attach(pose(CUES.catch));
-  const K_NODE = { x: 738, y: 284 }; // 片想い, where the cushion comes to rest (screen, t = 8.0)
+  function clipHeart(t, p = pose(t)) { // cushion centre in the footage, on stage
+    const i = clamp(Math.round(clipTime(t) * CLIP.fps), 0, CLIP.frames - 1);
+    let hc = CLIP.heart[i];
+    for (let k = 1; !hc && k < 12; k++) hc = CLIP.heart[i - k] || CLIP.heart[i + k];
+    return hc && { x: p.x + (hc[0] - CLIP.feet[0]) * VS, y: FEET_Y + p.y + (hc[1] - CLIP.feet[1]) * VS };
+  }
+  const heldHeart = (t, p) => (CLIP && clipHeart(t, p)) || attach(p);
+  // 片想い sits where the cushion comes to rest (screen, t = 8.0)
+  const K_NODE = (CLIP && clipHeart(8.0)) || { x: 738, y: 284 };
   const HEART_PATH = [[5.8, A_SLIP.x, A_SLIP.y], [6.05, 1165, 382], [6.5, 1030, 318], [7.1, 880, 280],
     [7.7, 770, 284], [8.0, K_NODE.x, K_NODE.y], [8.15, A_CATCH.x, A_CATCH.y]];
   function heartFloat(t) {
@@ -202,6 +223,13 @@
   // ---------------------------------------------------------------- DOM build
   const stage = $("stage"), mid = $("mid"), msvg = $("mid-svg"), far = $("far"), near = $("near");
   const fxb = $("fx-back"), fx = $("fx"), hud = $("hud"), endcard = $("endcard");
+  const clipWrap = $("clip-wrap"), clipVid = $("clip");
+  if (CLIP) {
+    clipVid.src = CLIP.src;
+    const [x0, y0, x1, y1] = CLIP.crop;
+    clipVid.style.width = px((x1 - x0) * VS); clipVid.style.height = px((y1 - y0) * VS);
+    clipWrap.style.transformOrigin = `${px((CLIP.feet[0] - x0) * VS)} ${px((CLIP.feet[1] - y0) * VS)}`;
+  }
   const girl = $("girl"), girlFront = $("girl-front"), gHug = $("g-hug"), gEmpty = $("g-empty"), heart = $("heart"), sweep = $("sweep");
 
   const WHITE = "#fdfdf8", PINK = "#fb6c78", LIME = "#62c20c";
@@ -515,19 +543,27 @@
 
     // character
     const p = pose(t);
+    const onStage = t >= 1.4 && t <= 13.4;
+    clipWrap.style.visibility = CLIP && onStage ? "visible" : "hidden"; // a display:none video may not repaint after a seek
+    if (CLIP) {
+      const [x0, y0] = CLIP.crop;
+      clipWrap.style.transform = tf(p.x - (CLIP.feet[0] - x0) * VS, FEET_Y + p.y - (CLIP.feet[1] - y0) * VS, ` rotate(${p.rot.toFixed(2)}deg)`);
+      clipWant = onStage ? clipTime(t) : null;
+    }
     girl.style.transform = tf(p.x - AX * S, FEET_Y - AY * S + p.y, ` rotate(${p.rot.toFixed(2)}deg) scale(${p.sx.toFixed(3)},${p.sy.toFixed(3)})`);
     girlFront.style.transform = girl.style.transform;
     girlFront.style.display = t >= CUES.slip && t < CUES.slip + 0.5 ? "" : "none"; // cushion slips out from under her sleeve
     gHug.style.opacity = p.hug ? 1 : 0; gEmpty.style.opacity = p.hug ? 0 : 1;
-    girl.style.display = t < 1.4 || t > 13.4 ? "none" : "";
-    if (!p.hug) {
+    girl.style.display = CLIP || !onStage ? "none" : "";
+    if (CLIP) girlFront.style.display = "none";
+    if (!p.hug && !CLIP) {
       const hf = heartFloat(t);
       heart.style.display = "";
       heart.style.transform = tf(hf.x - 170, hf.y - 160, ` rotate(${hf.rot.toFixed(2)}deg) scale(${hf.sc.toFixed(3)})`);
     } else heart.style.display = "none";
     // catch flash
     const cr = clamp((t - CUES.catch) / 0.45);
-    const ca = attach(pose(CUES.catch));
+    const ca = heldHeart(CUES.catch, pose(CUES.catch));
     ring.setAttribute("cx", ca.x); ring.setAttribute("cy", ca.y);
     ring.setAttribute("r", 60 + cr * 150); ring.setAttribute("opacity", t >= CUES.catch && cr < 1 ? (1 - cr) * 0.9 : 0);
 
@@ -551,7 +587,7 @@
     // dotted branch 好き → the cushion she is holding
     const bv = seg(t, 3.75, 4.05, E.out) * (1 - seg(t, 5.55, 5.8));
     if (bv > 0) {
-      const nx = byId.suki.wx + cam, ny = TRACK_Y, hp = attach(p);
+      const nx = byId.suki.wx + cam, ny = TRACK_Y, hp = heldHeart(t, p);
       branch.setAttribute("d", `M${nx} ${ny} Q${nx - 300} ${(ny + hp.y) / 2 + 40} ${hp.x - 60} ${hp.y + 30}`);
       const L = branch.getTotalLength(), grow = seg(t, 3.75, 4.05, E.out);
       branch.style.strokeDasharray = dashReveal(L, grow);
@@ -650,6 +686,28 @@
     });
   }
 
+  // ---------------------------------------------------------------- footage sync
+  let clipWant = null;
+  const clipFrameTime = (c) => (Math.floor(clamp(c, 0, CLIP.frames / CLIP.fps - 1e-3) * CLIP.fps) + 0.5) / CLIP.fps;
+  function seekClip(c) { // resolves once the requested frame is decoded
+    return new Promise((res) => {
+      const target = clipFrameTime(c);
+      if (Math.abs(clipVid.currentTime - target) < 1e-3 && clipVid.readyState >= 2) return res();
+      clipVid.addEventListener("seeked", () => requestAnimationFrame(() => requestAnimationFrame(res)), { once: true });
+      clipVid.currentTime = target;
+    });
+  }
+  async function renderAsync(t) {
+    render(t);
+    if (CLIP && clipWant != null) await seekClip(clipWant);
+  }
+  function syncClip() { // live playback: let the video run, nudge it back when it drifts
+    if (!CLIP) return;
+    if (clipWant == null) { if (!clipVid.paused) clipVid.pause(); return; }
+    if (Math.abs(clipVid.currentTime - clipWant) > 0.1) clipVid.currentTime = clipWant;
+    if (clipVid.paused) clipVid.play().catch(() => {});
+  }
+
   // dotted line revealed along its length: dashes up to L*p, then a long gap
   function dashReveal(L, p, dash = 2, gap = 15) {
     const shown = L * p, unit = dash + gap, out = [];
@@ -675,13 +733,16 @@
   const imgs = [...document.images].map((im) => (im.complete ? Promise.resolve() : new Promise((r) => { im.onload = im.onerror = r; })));
   const fonts = ['900 60px "Zen Maru Gothic"', '700 60px "Zen Maru Gothic"', '900 30px "Nunito"', '800 30px "Nunito"']
     .map((f) => document.fonts.load(f, "恋あLINE"));
-  const ready = Promise.all([...imgs, ...fonts, document.fonts.ready]);
+  const clipReady = !CLIP ? Promise.resolve() : new Promise((r) => {
+    if (clipVid.readyState >= 2) r(); else { clipVid.addEventListener("loadeddata", r, { once: true }); clipVid.addEventListener("error", r, { once: true }); }
+  });
+  const ready = Promise.all([...imgs, ...fonts, clipReady, document.fonts.ready]);
 
-  window.MV = { DUR, CUES, render, ready, fps: 30,
+  window.MV = { DUR, CUES, render, renderAsync, ready, fps: 30, clip: CLIP && CLIP_NAME,
     debug: () => ({ st: ST.map((q) => [q.id, Math.round(q.wx), q.wy]), cam: [0, 1.4, 2.35, 3.4, 3.75, 5.8, 6.35, 8, 8.5, 10.3, 11.25, 12.2, 12.7, 15].map((t) => [t, Math.round(camX(t)), Math.round(girlX(t))]) }) };
 
   const still = params.get("t");
-  ready.then(() => render(still != null ? parseFloat(still) : 13.9));
+  ready.then(() => renderAsync(still != null ? parseFloat(still) : 13.9));
   if (renderMode || still != null) { $("ui").classList.add("hidden"); return; }
 
   // ---------------------------------------------------------------- player
@@ -697,6 +758,7 @@
     const loop = () => {
       const t = ctx.currentTime - start;
       render(Math.max(0, t));
+      syncClip();
       if (t < DUR + 0.2) raf = requestAnimationFrame(loop);
       else { label.textContent = "REPLAY"; ui.classList.remove("hidden"); }
     };

@@ -18,7 +18,7 @@ fs.mkdirSync(path.dirname(out), { recursive: true });
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
 page.on("pageerror", (e) => console.error("[pageerror]", e.message));
-await page.goto(pathToFileURL(path.join(root, "index.html")).href + "?render");
+await page.goto(pathToFileURL(path.join(root, "index.html")).href + "?render" + (process.env.CLIP ? "&clip=" + process.env.CLIP : ""));
 const dur = await page.evaluate(async () => { await window.MV.ready; return window.MV.DUR; });
 
 // soundtrack → 16-bit WAV
@@ -50,7 +50,7 @@ const ff = spawn(ffmpeg, ["-y", "-loglevel", "error", "-f", "image2pipe", "-fram
   "-c:a", "aac", "-b:a", "256k", "-movflags", "+faststart", "-shortest", out], { stdio: ["pipe", "inherit", "inherit"] });
 const frames = Math.round(dur * FPS);
 for (let i = 0; i < frames; i++) {
-  await page.evaluate((t) => window.MV.render(t), i / FPS);
+  await page.evaluate((t) => window.MV.renderAsync(t), i / FPS);
   const png = await page.screenshot({ type: "png" });
   if (!ff.stdin.write(png)) await new Promise((r) => ff.stdin.once("drain", r));
   if (i % 30 === 0) process.stdout.write(`\rframe ${i}/${frames}`);

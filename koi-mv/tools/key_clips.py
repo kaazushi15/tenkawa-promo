@@ -1,8 +1,9 @@
 """Download the Kling character clips and key out their flat green background.
 
 Each clip becomes clips/<name>.webm (VP9 with alpha) cropped to the area the girl
-occupies, plus clips/<name>.json with the crop box and the per-frame centre of the
-pink cushion (used to line the stations up with the heart).
+occupies, plus clips/<name>.js, which registers the crop box, where her feet stand
+in the first frame, and the per-frame centre of the pink cushion (used to line the
+stations up with the heart) as window.KOI_CLIPS[name] for js/mv.js.
 
 Keying: the plate is one flat lime field with a soft vignette, but her cardigan is
 a pale lime too, so a plain chroma key would eat it. Instead the background is
@@ -86,8 +87,16 @@ def process(name, url):
     for r in rgbas:
         enc.stdin.write(np.ascontiguousarray(r[y0:y1, x0:x1]).tobytes())
     enc.stdin.close(); enc.wait()
-    meta = {"fps": FPS, "frames": len(rgbas), "crop": [int(x0), int(y0), int(x1), int(y1)], "heart": hearts}
-    (OUT / f"{name}.json").write_text(json.dumps(meta))
+    # feet anchor: lowest opaque rows of the first frame
+    a0 = rgbas[0][..., 3] > 128
+    rows = np.nonzero(a0.any(axis=1))[0]
+    foot_y = int(rows.max())
+    fx = np.nonzero(a0[foot_y - 60:foot_y + 1].any(axis=0))[0]
+    meta = {"src": f"clips/{name}.webm", "fps": FPS, "frames": len(rgbas),
+            "crop": [int(x0), int(y0), int(x1), int(y1)],
+            "feet": [float((fx.min() + fx.max()) / 2), foot_y], "height": int(foot_y - rows.min()),
+            "heart": [[round(v, 1) for v in h] if h else None for h in hearts]}
+    (OUT / f"{name}.js").write_text(f"(window.KOI_CLIPS = window.KOI_CLIPS || {{}})[{json.dumps(name)}] = {json.dumps(meta)};\n")
     print(name, meta["frames"], "frames, crop", meta["crop"])
 
 

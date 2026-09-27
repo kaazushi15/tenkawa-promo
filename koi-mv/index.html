@@ -38,6 +38,7 @@
     <div id="actor" class="layer">
       <div id="girl" class="sprite"><img id="g-hug" src="assets/girl.png" alt=""><img id="g-empty" src="assets/girl_empty.png" alt=""></div>
       <svg id="heart" class="heart" viewBox="0 0 340 320"><use href="#heart-sym"/></svg>
+      <div id="clip-wrap"><video id="clip" muted playsinline preload="auto"></video></div>
       <div id="girl-front" class="sprite"><img src="assets/girl_sleeve.png" alt=""></div>
     </div>
     <div id="near" class="layer"></div>
@@ -51,6 +52,7 @@
 
 <div id="ui"><div id="play"><svg viewBox="0 0 22 22"><path d="M5 3l14 8-14 8Z" fill="currentColor"/></svg><span>PLAY</span></div></div>
 
+<script>document.write('<script src="clips/' + (new URLSearchParams(location.search).get("clip") || "kling15") + '.js" onerror="this.remove()"><\/script>');</script>
 <script src="js/audio.js"></script>
 <script src="js/mv.js"></script>
 </body>
