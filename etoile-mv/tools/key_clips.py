@@ -33,7 +33,7 @@ def frames(path):
     p.wait()
 
 
-def key(rgb):
+def key(rgb, holes=False):
     a = rgb.astype(np.float32)
     R, G, B = a[..., 0], a[..., 1], a[..., 2]
     # background reference from the frame border (tracks the vignette/grade per frame)
@@ -43,6 +43,8 @@ def key(rgb):
     lab, _ = ndi.label(greenish)
     edge = np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]])
     bg = np.isin(lab, list(set(np.unique(edge)) - {0}))
+    if holes:  # nothing she wears is green: also clear the green seen through gaps (hair, bag, arm)
+        bg |= greenish & ndi.binary_opening(greenish, iterations=1)
     fg = ~bg
     lab2, n = ndi.label(fg, structure=np.ones((3, 3)))
     if n:
@@ -54,6 +56,9 @@ def key(rgb):
     band = ndi.binary_dilation(fg, iterations=2) & ~ndi.binary_erosion(fg, iterations=1)
     d = np.linalg.norm(a - ref, axis=-1) / (np.linalg.norm(ref) * 0.55)
     alpha[band] = np.clip(d[band], 0, 1)
+    if holes:  # despill the green fringe on hair strands
+        m = np.maximum(R, B)
+        rgb[..., 1] = np.where(fg & (G > m), m, G).astype(np.uint8)
     return (alpha * 255).astype(np.uint8)
 
 
@@ -64,16 +69,37 @@ def heart_centre(rgb, alpha):
     return [float(xs.mean()), float(ys.mean())] if len(xs) > 500 else None
 
 
-def process(name, url):
+def torso_x(alpha):
+    """Horizontal centre of the head and shoulders (the top third of the figure).
+    Legs, coat tails and the bag swing; this part rides steadily with her."""
+    rows = np.nonzero((alpha > 128).any(axis=1))[0]
+    if not len(rows):
+        return None
+    y0 = rows.min(); y1 = y0 + (rows.max() - y0) // 3
+    xs = np.nonzero(alpha[y0:y1] > 128)[1]
+    return float(xs.mean()) if len(xs) else None
+
+
+def smooth(v, win):
+    v = np.array([np.nan if x is None else x for x in v], float)
+    ok = ~np.isnan(v)
+    v = np.interp(np.arange(len(v)), np.nonzero(ok)[0], v[ok])
+    k = np.ones(win) / win
+    return np.convolve(np.pad(v, win // 2, mode="edge"), k, mode="valid")[:len(v)]
+
+
+def process(name, url, holes=False):
     OUT.mkdir(exist_ok=True)
     src = OUT / f"{name}.src.mp4"
     if not src.exists() and url:
         urllib.request.urlretrieve(url, src)
-    rgbas, hearts = [], []
+    rgbas, hearts, cxs = [], [], []
     for f in frames(src):
-        al = key(f)
+        f = f.copy()
+        al = key(f, holes)
         rgbas.append(np.dstack([f, al]))
         hearts.append(heart_centre(f, al))
+        cxs.append(torso_x(al))
     # one crop box for the whole clip
     any_a = np.max([r[..., 3] for r in rgbas], axis=0) > 8
     ys, xs = np.nonzero(any_a)
@@ -94,12 +120,15 @@ def process(name, url):
     meta = {"src": f"clips/{name}.webm", "fps": FPS, "frames": len(rgbas),
             "crop": [int(x0), int(y0), int(x1), int(y1)],
             "feet": [float((fx.min() + fx.max()) / 2), foot_y], "height": int(foot_y - rows.min()),
-            "heart": [[round(v, 1) for v in h] if h else None for h in hearts]}
+            "heart": [[round(v, 1) for v in h] if h else None for h in hearts],
+            "cx": [round(float(v), 1) for v in smooth(cxs, FPS + 1)]}  # smoothed torso x per frame
     (OUT / f"{name}.js").write_text(f"(window.KOI_CLIPS = window.KOI_CLIPS || {{}})[{json.dumps(name)}] = {json.dumps(meta)};\n")
     print(name, meta["frames"], "frames, crop", meta["crop"])
 
 
 if __name__ == "__main__":
     clips = json.loads((ROOT / "tools" / "clips.json").read_text())
-    for name in sys.argv[1:] or [k for k in clips if k != "note"]:
-        process(name, clips[name])
+    holes = "--holes" in sys.argv  # for characters with no green on them
+    names = [a for a in sys.argv[1:] if not a.startswith("--")]
+    for name in names or [k for k in clips if k != "note"]:
+        process(name, clips[name], holes)

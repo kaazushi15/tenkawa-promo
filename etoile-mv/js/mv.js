@@ -139,15 +139,18 @@
   const CLIP_NAME = new URLSearchParams(location.search).get("clip") || "h3";
   const CLIP = (window.KOI_CLIPS || {})[CLIP_NAME] || null;
   const VS = CLIP ? HEIGHT / CLIP.height : 1;                  // clip px → stage px
-  const clipTime = keys((CLIP && CLIP.sync) || [[0, 0], [15, 15]]);
+  // story time → clip time (h3: brisk 0–1.8s, head down 2–6s, looks up with a fist 6–9s,
+  // bright stride from 9.5s). The struggle stations play the head-down walk a little slow,
+  // the turn at 7.5s lands on her looking up, and the rest runs at about real speed.
+  const clipTime = keys((CLIP && CLIP.sync) || [[0, 0], [1.875, 1.875], [5.6, 4.6], [7.35, 5.95], [7.5, 6.3],
+    [9.4, 9.2], [13.4, 13.4], [15, 15]]);
   const SS = HEIGHT / (SPR.ay - SPR.top);                      // sprite scale
 
   const womanX = keys([[0, -260], [0.85, FOOT_X, E.out], [15, FOOT_X]]);
   function pose(t) {
     const x = womanX(t);
     if (CLIP) {
-      const hop = 32 * bump(t, 11.62, 11.95) * (CLIP.hop ? 0 : 1);
-      return { x, y: -hop, rot: 0 };
+      return { x, y: 0, rot: 0 }; // the footage carries all of her motion
     }
     const low = seg(t, 5.5, 5.9) * (1 - seg(t, 7.3, 7.6));
     const p = t / BEAT;
@@ -405,7 +408,10 @@
     const p = pose(t);
     if (CLIP) {
       const [x0, y0] = CLIP.crop;
-      const ox = p.x - (CLIP.feet[0] - x0) * VS, oy = TY + p.y - (CLIP.feet[1] - y0) * VS;
+      // hold her head and shoulders steady: the generated camera drifts a little
+      const i = clamp(Math.floor(clipTime(t) * CLIP.fps), 0, CLIP.frames - 1);
+      const drift = CLIP.cx ? CLIP.cx[i] - CLIP.cx[0] : 0;
+      const ox = p.x - (CLIP.feet[0] - x0 + drift) * VS, oy = TY + p.y - (CLIP.feet[1] - y0) * VS;
       clipWrap.style.transform = tf(ox, oy);
       clipWant = clipTime(t);
     } else {
