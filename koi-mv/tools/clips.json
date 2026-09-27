@@ -1,0 +1,8 @@
+{
+  "note": "Kling 3.0 image-to-video takes (OpenArt), generated from the green-screen character plate",
+  "walk_a": "https://cdn.openart.ai/openart-ai/production/2026-09/create-video/FpKmS8UM5GZDqSXHc6RP/195d73010ebc1d26b91d85a41902c46d-b038bb49-2d17-47fd-8b25-2ee09b902201_1790467814642_245fc29e.mp4",
+  "walk_b": "https://cdn.openart.ai/openart-ai/production/2026-09/create-video/FpKmS8UM5GZDqSXHc6RP/24c216a6445c3f9a92974f223912c7f6-ff36e663-2a05-41a2-9660-7b1aa23de1d6_1790467797938_189af814.mp4",
+  "chase_a": "https://cdn.openart.ai/openart-ai/production/2026-09/create-video/FpKmS8UM5GZDqSXHc6RP/fbc5cbe855ffc83f7dcaeaf2870ab42a-daaefa5e-d980-4c1c-98f1-d97a23a55d75_1790467920590_d384cd96.mp4",
+  "chase_b": "https://cdn.openart.ai/openart-ai/production/2026-09/create-video/FpKmS8UM5GZDqSXHc6RP/78b6d72ab7f7b166a5b1ca7a9752f474-524d0529-cba2-4e78-99cf-0b51f5584df0_1790467835583_ba3e3953.mp4",
+  "relief": "https://cdn.openart.ai/openart-ai/production/2026-09/create-video/FpKmS8UM5GZDqSXHc6RP/0bd6b82c1f038247f51871cdee566e40-60f4b084-3bcf-4f9b-a2eb-c7f4cb92f585_1790467803734_74fb133a.mp4"
+}
