@@ -44,6 +44,6 @@ tools/fonts.py     画面に出る全文字からフォントのサブセット�
 
 ```sh
 python3 tools/cutout.py                       # 素材の再生成（任意）
-python3 tools/key_clips.py h3                 # clips/h3.src.mp4 を置いてから実行
+python3 tools/key_clips.py h3 --holes         # clips/h3.src.mp4 を置いてから実行（--holes: 髪やバッグのすき間の緑も消す）
 NODE_PATH=$(npm root -g) node tools/render.mjs dist/etoile.mp4
 ```
