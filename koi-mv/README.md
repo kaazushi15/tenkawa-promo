@@ -10,6 +10,13 @@ HTML / CSS / JavaScript だけで組んだ 15 秒のリリックビデオです�
 - ブラウザで見る: `index.html` を開いてクリック（またはスペースキー）で再生
 - メイキング: `dist/making-of.mp4` / `making.html`（同じテイストの15秒「HOW IT'S MADE」）
 
+## 別の画像・別の尺で作る
+
+路線図風のキービジュアルなら、同じ方法で 15〜30 秒の MV を作れます。
+- `.claude/skills/rosenzu-mv/meta-prompt.md` … 画像と一緒に AI チャットへ貼るメタプロンプト（文字の全書き出し → 構成 → キャラ動画のプロンプト）
+- `.claude/skills/rosenzu-mv/SKILL.md` … Claude Code 用の制作手順（`/rosenzu-mv`）
+- `.claude/skills/rosenzu-mv/example-koi.md` … この作品の画像の文字をすべて書き出した表と、30 秒版の構成案
+
 ## メイキング（making.html）
 
 制作の工程を路線図の7駅に見立て、カメラが駅から駅へ進みながら、実際の制作素材で各工程を見せます。
