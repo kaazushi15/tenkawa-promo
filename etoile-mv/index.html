@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Étoile DIET JOURNEY — 15s MV</title>
+<link rel="stylesheet" href="css/mv.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="star" viewBox="-50 -50 100 100"><path d="M0 -50C3 -12 12 -3 50 0C12 3 3 12 0 50C-3 12 -12 3 -50 0C-12 -3 -3 -12 0 -50Z"/></symbol>
+    <symbol id="i-woman" viewBox="0 0 48 64"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><circle cx="24" cy="9" r="6"/><path d="M15 22h18l5 20H10Z M18 42v19 M30 42v19"/></g></symbol>
+    <symbol id="i-coach" viewBox="0 0 48 64"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><circle cx="24" cy="9" r="6"/><path d="M16 22h16v20H16Z M16 26l-6 12 M32 26l6 12 M19 42v19 M29 42v19"/></g></symbol>
+    <symbol id="i-food" viewBox="0 0 48 64"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="8" y="16" width="32" height="42" rx="6"/><path d="M8 30h32 M16 16V8h16v8 M16 40v10 M24 40v10 M32 40v10"/></g></symbol>
+    <symbol id="i-bag" viewBox="0 0 48 64"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M6 24h36l-3 34H9Z M16 24v-6a8 8 0 0 1 16 0v6"/><path d="M34 52c-3-2-7-5-7-8 0-2 1.5-3.4 3.4-3.4 1.4 0 2.8.9 3.6 2.2.8-1.3 2.2-2.2 3.6-2.2 1.9 0 3.4 1.4 3.4 3.4 0 3-4 6-7 8Z"/></g></symbol>
+  </defs>
+</svg>
+
+<div id="stage">
+  <div id="scene" class="layer">
+    <div id="far" class="layer"></div>
+    <div id="world" class="layer"><svg id="world-svg" class="abs" width="1" height="1"></svg></div>
+    <svg id="fx-back" class="abs" width="1920" height="1080"></svg>
+    <div id="actor" class="layer">
+      <div id="woman" class="sprite"><img src="assets/woman.png" alt=""></div>
+      <div id="clip-wrap"><video id="clip" muted playsinline preload="auto"></video></div>
+    </div>
+    <div id="shade" class="layer"></div>
+    <div id="near" class="layer"></div>
+    <div id="lyrics" class="layer"></div>
+    <div id="top" class="layer"></div>
+  </div>
+  <div id="wipe" class="layer"></div>
+  <div id="endcard" class="layer"></div>
+  <svg id="sweep" class="abs" width="1920" height="1080"><use href="#star" id="sweep-star" width="100" height="100" x="-50" y="-50" fill="#fff"/></svg>
+  <canvas id="grain" class="layer" width="960" height="540"></canvas>
+</div>
+
+<div id="ui"><div id="play"><svg viewBox="0 0 22 22"><path d="M5 3l14 8-14 8Z" fill="currentColor"/></svg><span>PLAY</span></div></div>
+
+<script>document.write('<script src="clips/' + (new URLSearchParams(location.search).get("clip") || "h3") + '.js" onerror="this.remove()"><\/script>');</script>
+<script src="js/audio.js"></script>
+<script src="js/typo.js"></script>
+<script src="js/mv.js"></script>
+</body>
+</html>
