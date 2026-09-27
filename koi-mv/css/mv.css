@@ -1,0 +1,106 @@
+@font-face { font-family: "Zen Maru Gothic"; font-weight: 700; font-display: block; src: url("../fonts/zenmaru-700.woff2") format("woff2"); }
+@font-face { font-family: "Zen Maru Gothic"; font-weight: 900; font-display: block; src: url("../fonts/zenmaru-900.woff2") format("woff2"); }
+@font-face { font-family: "Nunito"; font-weight: 800; font-display: block; src: url("../fonts/nunito-800.woff2") format("woff2"); }
+@font-face { font-family: "Nunito"; font-weight: 900; font-display: block; src: url("../fonts/nunito-900.woff2") format("woff2"); }
+
+:root {
+  --lime: #62c20c;
+  --lime-text: #4aa60a;
+  --white: #fdfdf8;
+  --pink: #fb6c78;
+  --petal: #f6bace;
+  --ink: #1b1b25;
+  --jp: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+  --en: "Nunito", "Zen Maru Gothic", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #0e1a06; overflow: hidden; }
+body { font-family: var(--jp); color: var(--white); -webkit-font-smoothing: antialiased; }
+
+#stage {
+  position: absolute; left: 0; top: 0;
+  width: 1920px; height: 1080px;
+  overflow: hidden; background: var(--lime);
+  transform-origin: 0 0;
+}
+.layer, .abs { position: absolute; left: 0; top: 0; }
+.layer { width: 1920px; height: 1080px; }
+svg { overflow: visible; }
+
+/* ---------- world ---------- */
+.frag {
+  position: absolute; white-space: nowrap; line-height: 1;
+  font-weight: 900; color: var(--white); letter-spacing: -0.02em;
+}
+.station {
+  position: absolute; display: flex; flex-direction: column; align-items: center;
+  padding: 9px 18px 8px; border-radius: 12px; background: var(--white);
+  color: var(--lime-text); transform-origin: 50% 0;
+  box-shadow: 0 0 0 4px var(--lime);
+}
+.station b { font-size: 31px; font-weight: 900; line-height: 1.1; letter-spacing: 0.04em; }
+.station i { font: normal 900 14px/1.2 var(--en); letter-spacing: 0.12em; margin-top: 2px; }
+.station.air { transform-origin: 100% 50%; }
+.tile {
+  position: absolute; width: 58px; height: 58px; border-radius: 12px;
+  border: 4px solid var(--white); display: grid; place-items: center;
+}
+.tile svg { width: 36px; height: 36px; }
+.petal { position: absolute; width: 22px; height: 16px; }
+
+/* ---------- character ---------- */
+.sprite { position: absolute; left: 0; top: 0; width: 710.4px; height: 806.6px; transform-origin: 355.2px 785.9px; }
+.sprite img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.heart { position: absolute; left: 0; top: 0; width: 340px; height: 320px; transform-origin: 170px 160px; }
+
+/* ---------- screen-space text ---------- */
+.line { position: absolute; white-space: nowrap; font-weight: 900; line-height: 1; }
+.line span { display: inline-block; will-change: transform, opacity; }
+#t1 .line { font-size: 66px; letter-spacing: 0.04em; }
+#field {
+  position: absolute; left: 104px; top: 128px; height: 74px; border-radius: 37px;
+  background: var(--white); overflow: hidden; transform-origin: 37px 37px;
+}
+#field-text {
+  position: absolute; left: 92px; top: 18px; white-space: nowrap;
+  font-size: 36px; font-weight: 900; color: var(--lime-text); letter-spacing: 0.03em; line-height: 1;
+}
+#caret { display: inline-block; width: 4px; height: 38px; margin-left: 3px; vertical-align: -6px; background: var(--pink); }
+#l2 .line { font-size: 58px; letter-spacing: 0.05em; }
+#l3 .line { font-size: 52px; letter-spacing: 0.05em; }
+.dash { position: absolute; height: 0; border-top: 4px dashed var(--white); }
+#credit { position: absolute; right: 140px; top: 44px; font: 900 24px/1 var(--en); letter-spacing: 0.16em; }
+
+/* ---------- end card ---------- */
+#endcard { background: var(--lime); }
+#np {
+  position: absolute; left: 150px; top: 318px; padding: 12px 26px 11px;
+  border: 4px solid var(--white); border-radius: 14px;
+  font: 900 32px/1 var(--en); letter-spacing: 0.12em; white-space: nowrap;
+}
+#np-tri { font-family: var(--jp); font-size: 26px; margin-left: 4px; }
+#title { position: absolute; left: 132px; top: 400px; font-size: 138px; font-weight: 900; letter-spacing: 0.01em; white-space: nowrap; line-height: 1.1; }
+#title span { display: inline-block; }
+#yoshina { position: absolute; left: 150px; top: 610px; font: 900 96px/1 var(--en); letter-spacing: 0.06em; }
+#yls { position: absolute; left: 156px; top: 724px; font: 900 32px/1 var(--en); letter-spacing: 0.3em; }
+
+.jlabel { position: absolute; display: flex; flex-direction: column; align-items: center; line-height: 1; white-space: nowrap; transform: translateX(-50%); }
+.jlabel b { font-size: 28px; font-weight: 900; letter-spacing: 0.04em; }
+.jlabel i { font: normal 900 13px/1 var(--en); letter-spacing: 0.14em; margin-top: 6px; }
+
+#grain { pointer-events: none; mix-blend-mode: multiply; opacity: 0.55; }
+
+/* ---------- player chrome (not rendered into the video) ---------- */
+#ui {
+  position: fixed; inset: 0; display: grid; place-items: center;
+  background: rgba(14, 26, 6, 0.35); cursor: pointer; transition: opacity 0.3s;
+}
+#ui.hidden { opacity: 0; pointer-events: none; }
+#play {
+  display: flex; align-items: center; gap: 14px; padding: 18px 34px 17px;
+  border-radius: 999px; background: var(--white); color: var(--lime-text);
+  font: 900 26px/1 var(--en); letter-spacing: 0.14em; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+#play svg { width: 22px; height: 22px; }
+body.render #ui { display: none; }
