@@ -72,7 +72,7 @@ svg { overflow: visible; }
 #l2 .line { font-size: 58px; letter-spacing: 0.05em; }
 #l3 .line { font-size: 52px; letter-spacing: 0.05em; }
 .dash { position: absolute; height: 0; border-top: 4px dashed var(--white); }
-#credit { position: absolute; right: 140px; top: 44px; font: 900 24px/1 var(--en); letter-spacing: 0.16em; }
+#credit { position: absolute; right: 18px; top: 400px; writing-mode: vertical-rl; font: 900 20px/1 var(--en); letter-spacing: 0.3em; }
 
 /* ---------- end card ---------- */
 #endcard { background: var(--lime); }

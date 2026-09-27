@@ -3,7 +3,8 @@
 キービジュアル（`assets/reference.webp`）の少女・路線図・タイポグラフィをそのまま使い、
 HTML / CSS / JavaScript だけで組んだ 15 秒のリリックビデオです。
 映像は `render(t)` という「時刻 → 画面」の純粋関数で描いているため、ブラウザ再生と MP4 書き出しが同じフレームになります。
-音楽と効果音も WebAudio でその場で合成しています（外部音源・動画生成 AI は不使用）。
+キャラクター（少女とハートのクッション）は Kling 3.0 で緑一色の背景の上に生成した15秒の映像を切り抜き、背景・路線図・リリックの上に重ねています。
+音楽と効果音は WebAudio でその場で合成しています。
 
 - 完成動画: `dist/koi-no-tabi.mp4`（1920×1080 / 30fps / 15.0秒 / AAC 48kHz、約 -13.5 LUFS）
 - ブラウザで見る: `index.html` を開いてクリック（またはスペースキー）で再生
@@ -27,14 +28,17 @@ index.html        舞台の骨組み（SVG シンボル：ハート、アイコ�
 css/mv.css        レイアウトとタイポグラフィ
 js/mv.js          カメラ・キャラクター・駅・歌詞・エンドカードを render(t) で描画
 js/audio.js       WebAudio による BGM（128BPM、D メジャー）と効果音、オフライン書き出し
-assets/           キービジュアル原画と、そこから切り出したキャラクター素材
+assets/           キービジュアル原画と、そこから切り出したキャラクター素材（映像が無いときの予備）
+clips/            切り抜き済みのキャラクター映像（kling15.webm：透過つき VP9）と位置情報
 fonts/            Zen Maru Gothic / Nunito（使用文字だけのサブセット）
 tools/cutout.py   原画から少女・ハートなし版・袖レイヤーを切り出す
+tools/key_clips.py 緑背景の映像からキャラクターを切り抜き、透過 WebM と位置情報を書き出す
 tools/render.mjs  MP4 書き出し（Playwright + ffmpeg）
 tools/stills.mjs  任意の時刻の静止画を書き出す
 ```
 
 `index.html?t=8.3` で任意時刻の静止画を表示できます。
+映像のどの部分をどの時刻に使うかは `js/mv.js` の `clipTime` で調整できます（追いかけは約1.5倍速、キャッチ後はスロー）。
 
 ## 書き出し
 
@@ -42,5 +46,6 @@ tools/stills.mjs  任意の時刻の静止画を書き出す
 npm i -g playwright            # Chromium はインストール済みのものを使用
 pip install pillow numpy scipy # 切り出しをやり直す場合のみ
 python3 tools/cutout.py        # 素材の再生成（任意）
+python3 tools/key_clips.py kling15   # clips/kling15.src.mp4 を置いてから実行すると切り抜きをやり直せる
 NODE_PATH=$(npm root -g) node tools/render.mjs dist/koi-no-tabi.mp4   # ffmpeg が必要（FFMPEG で場所を指定可）
 ```

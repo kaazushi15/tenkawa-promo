@@ -130,9 +130,14 @@
   // cut-out sprites when it is present. ?clip=<name> picks another take.
   const CLIP_NAME = new URLSearchParams(location.search).get("clip") || "kling15";
   const CLIP = (window.KOI_CLIPS || {})[CLIP_NAME] || null;
-  const VS = CLIP ? 760 / CLIP.height : 1; // clip px → stage px
-  // story time → clip time; retime the footage against the cues here
-  const clipTime = keys((CLIP && CLIP.sync) || [[1.4, 0], [1.87, 0.55], [5.8, 4.5], [8.15, 7.25], [10.3, 9.5], [13.4, 12.6]]);
+  // Scale so the clip's top edge meets the top of the stage: Kling's leap goes
+  // out of its own frame, and this way the cut lands on the stage edge.
+  const VS = CLIP ? FEET_Y / (CLIP.feet[1] - CLIP.crop[1]) : 1; // clip px → stage px
+  // story time → clip time (kling15: slip at 6.35s, catch at 11.5s). The chase is
+  // played ~1.5x and jump-cut between two matching strides (clip 8.0 → 9.6); after
+  // the catch the footage slows down under the lyric.
+  const clipTime = keys((CLIP && CLIP.sync) || [[1.4, 1.5], [5.8, 6.3], [6.9, 8.0], [6.9001, 9.6], [8.15, 11.5],
+    [10.3, 12.5], [13.4, 15.0]]);
 
   // ---------------------------------------------------------------- character
   const girlX = keys([[0, 2380], [1.4, 2380], [1.87, 1480], [2.2, 1466, E.out], [5.8, 1330],
@@ -605,7 +610,8 @@
     });
     // relief: little hearts rise from her head
     RELIEF.forEach((r) => {
-      const dt = t - r.t0, on = dt >= 0 && dt < 1.1, hx = p.x - 60 + r.dx, hy = FEET_Y - 690 + p.y;
+      const dt = t - r.t0, on = dt >= 0 && dt < 1.1, hx = p.x - 60 + r.dx;
+      const hy = (CLIP ? FEET_Y - CLIP.height * VS * 0.8 : FEET_Y - 690) + p.y;
       r.e.setAttribute("opacity", on ? bump(t, r.t0, r.t0 + 1.1) : 0);
       r.e.setAttribute("transform", `translate(${hx} ${hy - dt * 120}) scale(${(0.6 + 0.4 * seg(t, r.t0, r.t0 + 0.3, E.back)).toFixed(3)})`);
     });
