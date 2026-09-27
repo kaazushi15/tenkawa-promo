@@ -55,6 +55,7 @@
     return e;
   }
   const px = (v) => v.toFixed(2) + "px";
+  const tf = (x, y, extra = "") => `translate(${x.toFixed(2)}px,${y.toFixed(2)}px)${extra}`;
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const lerp = (a, b, p) => a + (b - a) * p;
   const E = {
@@ -256,7 +257,7 @@
   const ALIGN = [...TXT.title].map((ch, i) => {
     const e = h("div", "frag", far, ch);
     e.style.fontSize = "150px"; e.style.top = "0px";
-    return { e, tx: 118 + i * 152, ty: 318, k: 0.55 + ar() * 0.6, m: (ar() - 0.5) * 0.55 };
+    return { e, tx: 118 + i * 152, ty: 600, k: 0.55 + ar() * 0.6, m: (ar() - 0.5) * 0.55 };
   });
 
   // main route: enters top-right, two rounded bends, then runs along her feet
@@ -288,28 +289,27 @@
     pops.push({ e: s("circle", { cx: x, cy: y, r, fill: WHITE }, msvg), x, y, t0 });
   }
   // secondary routes hang off the stations so the map stays coherent if timings move
-  drawn(route([[F + 220, TRACK_Y], [F + 220, 560], [SK - 170, 560], [SK - 170, TRACK_Y]]), 12, 1.42, 1.9);
+  const routeA = drawn(route([[F + 220, TRACK_Y], [F + 220, 560], [SK - 170, 560], [SK - 170, TRACK_Y]]), 12, 1.42, 1.9);
   node((F + SK) / 2 + 25, 560, 1.72);
   drawn(route([[SK - 170, 560], [N - 100, 560], [N - 100, 830]]), 5, 1.6, 2.0, DOT);
   node(N - 100, 830, 1.95, 9);
-  drawn(route([[N - 200, TRACK_Y], [N - 200, 700], [K + 300, 700], [K + 300, 470], [K - 250, 470]]), 12, 1.45, 2.0);
+  const routeC = drawn(route([[N - 200, TRACK_Y], [N - 200, 700], [K + 300, 700], [K + 300, 470], [K - 250, 470]]), 12, 1.45, 2.0);
   node(K, 700, 1.8); node(K, 470, 1.85); node(K - 250, 470, 1.9);
   drawn(route([[K - 250, 470], [K - 580, 470], [K - 580, 780]]), 5, 1.7, 2.1, DOT);
-  drawn(route([[Y - 400, TRACK_Y], [Y - 400, 620], [Y - 820, 620], [Y - 820, 800]]), 12, 1.5, 2.0);
+  const routeB = drawn(route([[Y - 400, TRACK_Y], [Y - 400, 620], [Y - 820, 620], [Y - 820, 800]]), 12, 1.5, 2.0);
+  // invisible guides for the text that rides the routes, drawn left-to-right so it never reads upside down
+  const guide = (pts) => s("path", { d: route(pts), fill: "none", stroke: "none" }, msvg);
+  const textGuides = [
+    guide([[SK - 170, TRACK_Y], [SK - 170, 560], [F + 220, 560], [F + 220, TRACK_Y]]),
+    guide([[Y - 820, 800], [Y - 820, 620], [Y - 400, 620], [Y - 400, TRACK_Y]]),
+    guide([[K - 250, 470], [K + 300, 470], [K + 300, 700], [N - 200, 700], [N - 200, TRACK_Y]]),
+  ];
+  textGuides.forEach((g, i) => { g.id = "route-text-" + i; });
   node(Y - 820, 800, 1.95);
   drawn(route([[Y - 820, 620], [Y - 1220, 620], [Y - 1220, 430], [Y - 1600, 430]]), 5, 1.6, 2.1, DOT);
   drawn(route([[Y - 1100, TRACK_Y], [Y - 1100, 760], [Y - 1550, 760]]), 12, 1.5, 2.0);
   node(Y - 1550, 760, 1.95);
   const kBranch = drawn(route([[K, TRACK_Y], [K, KY]]), 12, 7.15, 7.5);
-
-  // shot 1 copy lives in the world and leaves before the cut into shot 3
-  const t1 = h("div", "", mid); t1.id = "t1";
-  const t1Chars = [];
-  TXT.t1.forEach((str, li) => {
-    const line = h("div", "line", t1);
-    line.style.left = "112px"; line.style.top = 116 + li * 90 + "px";
-    for (const ch of str) t1Chars.push(h("span", "", line, ch));
-  });
 
   // station nodes, labels and icon tiles
   ST.forEach((st, i) => {
@@ -407,7 +407,6 @@
   const l3Dash = h("div", "dash", hud); l3Dash.style.left = px(L3_X); l3Dash.style.top = "116px";
   const l3Chars = mkLines("l3", TXT.l3, L3_X + 34, 150, 78);
 
-  const credit = h("div", "", hud, TXT.song); credit.id = "credit";
 
   const HUD_X = 1856, HUD_Y = [884, 752, 620, 488, 356];
   const hudSvg = s("svg", { width: 1920, height: 1080 }, hud);
@@ -450,6 +449,10 @@
     lb.style.left = JX[i] + "px"; lb.style.top = JY + 26 + "px";
     return { g, lb, x: JX[i] };
   });
+  const script = h("div", "", endcard, "Koisuru Otome Love Song"); script.id = "script";
+  const notes = h("div", "", endcard); notes.id = "endnotes";
+  notes.append("SUNG BY YOSHINA", h("br"), "WORDS & MUSIC: YOSHINA");
+  h("b", "", notes, "恋の悩みエモい感じのラブソング");
   const yoshina = h("div", "", endcard, TXT.artist); yoshina.id = "yoshina";
   const yls = h("div", "", endcard, TXT.song); yls.id = "yls";
 
@@ -466,12 +469,20 @@
     g.fillStyle = v; g.fillRect(0, 0, c.width, c.height);
   })();
 
+  // kinetic typography and background motion (js/kinetic.js)
+  const kin = window.KoiKinetic({ h, s, seg, E, clamp, lerp, bump, rng, camX, BEAT, WHITE, PINK, tf, midSvg: msvg,
+    routePaths: textGuides, layers: { lyrics: $("lyrics"), hud, far, fx, fxBack: fxb, top: $("top") } });
+  const scene = $("scene");
+
   // ---------------------------------------------------------------- render
-  const tf = (x, y, extra = "") => `translate(${x.toFixed(2)}px,${y.toFixed(2)}px)${extra}`;
 
   function render(t) {
     t = clamp(t, 0, DUR);
     const cam = camX(t);
+    const pulse = kin.pulse(t);
+    // a small punch on each bar, a bigger one on the catch
+    const punch = t >= CUES.catch ? Math.exp(-(t - CUES.catch) * 6) : 0;
+    scene.style.transform = `scale(${(1 + 0.006 * pulse.bar + 0.035 * punch).toFixed(4)})`;
 
     // world layers
     mid.style.transform = tf(cam, 0);
@@ -486,19 +497,16 @@
       const q = seg(t, n.t0, n.t0 + 0.3, E.back);
       n.e.setAttribute("transform", `translate(${n.x} ${n.y}) scale(${q.toFixed(3)}) translate(${-n.x} ${-n.y})`);
     }
-    t1Chars.forEach((c, i) => {
-      const p = seg(t, 0.1 + i * 0.02, 0.38 + i * 0.02, E.out);
-      const o = seg(t, 3.08 + i * 0.012, 3.26 + i * 0.012, E.in);
-      c.style.opacity = p * (1 - o); c.style.transform = tf(0, (1 - p) * 42 + o * 30);
-    });
 
     // title fragments appear on the cut into shot 3 and drift slower than the routes
     const reveal = seg(t, 3.4, 3.62, E.out);
+    const fragOut = seg(t, 10.95, 11.3);
     FRAGS.forEach((f) => {
-      f.e.style.transform = tf(f.wx + cam, 0);
+      f.e.style.transform = tf(f.wx + cam, fragOut * 60, ` scale(${(1 + 0.012 * pulse.bar).toFixed(4)})`);
+      f.e.style.opacity = 1 - fragOut;
       f.e.style.clipPath = `inset(0 ${((1 - reveal) * 100).toFixed(1)}% 0 0)`;
     });
-    const aCam = camX(ALIGN_T), aVis = seg(t, 11.2, 11.6) * (1 - seg(t, 12.62, 12.7));
+    const aCam = camX(ALIGN_T), aVis = seg(t, 11.05, 11.45) * (1 - seg(t, 12.62, 12.7));
     ALIGN.forEach((a) => {
       const d = cam - aCam;
       a.e.style.opacity = aVis;
@@ -517,7 +525,7 @@
       if (st.id !== "namida") st.node.setAttribute("transform", `translate(${st.wx + gl} ${st.wy}) scale(${ap.toFixed(3)}) translate(${-st.wx} ${-st.wy})`);
       st.box.style.background = on ? PINK : ""; st.box.style.color = on ? WHITE : "";
       st.core.setAttribute("fill", on ? PINK : st.air ? PINK : LIME);
-      if (!st.air) st.core.setAttribute("r", on ? 9 : 7);
+      if (!st.air) st.core.setAttribute("r", on ? 9 + 3 * pulse.beat : 7);
       const rp = clamp(dt / 0.6);
       st.ripple.setAttribute("r", 17 + rp * 70); st.ripple.setAttribute("opacity", on && dt < 0.6 ? (1 - rp).toFixed(3) : 0);
       if (st.tile) {
@@ -537,10 +545,13 @@
     const nr = clamp((t - 6.6) / 0.6);
     nd.ripple.setAttribute("r", 17 + nr * 80); nd.ripple.setAttribute("opacity", t >= 6.6 && t < 7.2 ? 1 - nr : 0);
 
+    const kFade = 1 - seg(t, 10.15, 10.45);
+    for (const e of [byId.kataomoi.node, byId.kataomoi.ripple, kBranch, pulsePath]) e.setAttribute("opacity", kFade);
+    byId.kataomoi.box.style.opacity = kFade;
     // 片想い: pulse runs rightward to the lyric panel
     const pp = seg(t, CUES.pulse[0], CUES.pulse[1], E.io);
     pulsePath.style.strokeDashoffset = PULSE_LEN * (1 - pp);
-    pulsePath.setAttribute("opacity", t >= CUES.pulse[0] ? 1 : 0);
+    pulsePath.setAttribute("opacity", t >= CUES.pulse[0] ? kFade : 0);
     const pt = pulsePath.getPointAtLength(PULSE_LEN * pp);
     pulseDot.setAttribute("cx", pt.x); pulseDot.setAttribute("cy", pt.y);
     pulseDot.setAttribute("opacity", t >= CUES.pulse[0] && t < CUES.pulse[1] + 0.1 ? 1 : 0);
@@ -568,9 +579,11 @@
     } else heart.style.display = "none";
     // catch flash
     const cr = clamp((t - CUES.catch) / 0.45);
-    const ca = heldHeart(CUES.catch, pose(CUES.catch));
+    const ca = heldHeart(CUES.catch, pose(CUES.catch)), sp = heldHeart(CUES.slip, pose(CUES.slip));
     ring.setAttribute("cx", ca.x); ring.setAttribute("cy", ca.y);
     ring.setAttribute("r", 60 + cr * 150); ring.setAttribute("opacity", t >= CUES.catch && cr < 1 ? (1 - cr) * 0.9 : 0);
+
+    kin.render(t, { catchX: ca.x, catchY: ca.y, slipX: sp.x, slipY: sp.y });
 
     // petals drift in the near layer (faster parallax)
     const pv = seg(t, 1.4, 1.9);
@@ -645,7 +658,6 @@
     });
 
     // hud route recap
-    credit.style.opacity = seg(t, 1.6, 2.0);
     hudLine.style.strokeDashoffset = HUD_LEN * (1 - seg(t, 1.9, 2.4, E.io));
     hudRise.style.strokeDashoffset = HUD_RISE * (1 - seg(t, CUES.rise[0], CUES.rise[1], E.io));
     hudNodes.forEach((nn, i) => {
@@ -654,7 +666,7 @@
       nn.dot.setAttribute("fill", on ? PINK : WHITE);
       const rc = CUES.recap[i];
       const k = Math.max(on ? Math.exp(-(t - nn.t) * 6) : 0, t >= rc ? Math.exp(-(t - rc) * 7) : 0);
-      nn.dot.setAttribute("r", (11 + 7 * k).toFixed(2));
+      nn.dot.setAttribute("r", (11 + 7 * k + (on ? 3 * pulse.beat : 0)).toFixed(2));
       const hr = t >= rc ? clamp((t - rc) / 0.45) : on ? clamp((t - nn.t) / 0.45) : 1;
       nn.halo.setAttribute("r", 12 + hr * 26); nn.halo.setAttribute("opacity", hr < 1 ? 1 - hr : 0);
     });
@@ -685,6 +697,9 @@
     yls.style.opacity = seg(t, 13.32, 13.56);
     yls.style.transform = tf(0, lerp(20, 0, seg(t, 13.32, 13.58, E.out)));
     journey.style.strokeDashoffset = J_LEN * (1 - seg(t, 13.2, 13.5, E.io));
+    script.style.clipPath = `inset(0 ${(100 - 100 * seg(t, 13.22, 13.58, E.io)).toFixed(1)}% 0 0)`;
+    notes.style.opacity = seg(t, 13.3, 13.58);
+    notes.style.transform = tf(0, lerp(16, 0, seg(t, 13.3, 13.58, E.out)));
     jStops.forEach((j, i) => {
       const q = seg(t, 13.24 + i * 0.05, 13.4 + i * 0.05, E.back);
       j.g.setAttribute("transform", `translate(${j.x} ${JY}) scale(${q.toFixed(3)}) translate(${-j.x} ${-JY})`);

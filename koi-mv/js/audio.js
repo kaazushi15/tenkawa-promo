@@ -256,6 +256,11 @@ window.KoiAudio = (() => {
     blip(cues.pulse[0], 900, 1800, cues.pulse[1] - cues.pulse[0], 0.08); // pulse runs to the lyric
     // 勇気: a tiny phone trill
     for (let i = 0; i < 8; i++) blip(11.28 + i * 0.045, i % 2 ? 1600 : 1320, i % 2 ? 1600 : 1320, 0.04, 0.05);
+    // motion-graphics accents: word slams, stripe wipes, the burst when the cushion slips
+    for (const b of [1, 1.5, 2]) { const t = 1.875 + b * BEAT; blip(t, 520, 260, 0.09, 0.16, sfx, "triangle"); noiseHit(t, 0.05, "bandpass", 2200, 1, 0.12, sfx); }
+    for (const t of [3.28, 10.18]) sweep(t, 0.42, 900, 5200, 0.2);
+    sweep(5.78, 0.35, 1800, 7000, 0.12);
+    for (let i = 0; i < 5; i++) bell(93 + [0, 2, 4, 7, 9][i], 8.2 + i * 0.05, 0.22); // confetti sparkle
     // the cushion sweeps across the lens, left to right
     const w = sweep(cues.sweep[0] - 0.08, cues.sweep[1] - cues.sweep[0] + 0.2, 350, 1800, 0.34, sfx, 0.7);
     const pan = ctx.createStereoPanner();

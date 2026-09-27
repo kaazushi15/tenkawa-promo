@@ -1,6 +1,7 @@
 @font-face { font-family: "Zen Maru Gothic"; font-weight: 700; font-display: block; src: url("../fonts/zenmaru-700.woff2") format("woff2"); }
 @font-face { font-family: "Zen Maru Gothic"; font-weight: 900; font-display: block; src: url("../fonts/zenmaru-900.woff2") format("woff2"); }
 @font-face { font-family: "Nunito"; font-weight: 800; font-display: block; src: url("../fonts/nunito-800.woff2") format("woff2"); }
+@font-face { font-family: "Allura"; font-weight: 400; font-display: block; src: url("../fonts/allura-400.woff2") format("woff2"); }
 @font-face { font-family: "Nunito"; font-weight: 900; font-display: block; src: url("../fonts/nunito-900.woff2") format("woff2"); }
 
 :root {
@@ -72,7 +73,6 @@ svg { overflow: visible; }
 #l2 .line { font-size: 58px; letter-spacing: 0.05em; }
 #l3 .line { font-size: 52px; letter-spacing: 0.05em; }
 .dash { position: absolute; height: 0; border-top: 4px dashed var(--white); }
-#credit { position: absolute; right: 18px; top: 400px; writing-mode: vertical-rl; font: 900 20px/1 var(--en); letter-spacing: 0.3em; }
 
 /* ---------- end card ---------- */
 #endcard { background: var(--lime); }
@@ -90,6 +90,24 @@ svg { overflow: visible; }
 .jlabel { position: absolute; display: flex; flex-direction: column; align-items: center; line-height: 1; white-space: nowrap; transform: translateX(-50%); }
 .jlabel b { font-size: 28px; font-weight: 900; letter-spacing: 0.04em; }
 .jlabel i { font: normal 900 13px/1 var(--en); letter-spacing: 0.14em; margin-top: 6px; }
+
+#scene { transform-origin: 50% 50%; }
+/* kinetic typography */
+.ky .line { position: absolute; white-space: nowrap; font-weight: 900; line-height: 1; }
+.ky .line.vert { writing-mode: vertical-rl; }
+.ky .line span { display: inline-block; }
+.ticker { position: absolute; left: 0; top: 16px; white-space: nowrap; font: 900 15px/1 var(--en); letter-spacing: 0.26em; }
+.band {
+  position: absolute; left: 0; top: 392px; white-space: nowrap; font-weight: 900; font-size: 142px; line-height: 1;
+  color: transparent; -webkit-text-stroke: 3px rgba(253, 253, 248, 0.8); letter-spacing: 0.02em;
+}
+.ontrack { font: 700 19px var(--jp); fill: var(--white); letter-spacing: 0.12em; }
+.ringtext { font: 900 30px var(--en); fill: var(--white); letter-spacing: 0.14em; }
+.wipe { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.wipe .bar { position: absolute; left: 0; width: 1500px; height: 200px; }
+#script { position: absolute; left: 700px; top: 556px; font: 400 92px/1 "Allura", cursive; color: #f47a6b; white-space: nowrap; transform: rotate(-6deg); transform-origin: 0 50%; }
+#endnotes { position: absolute; right: 150px; top: 640px; text-align: right; font: 900 17px/1.9 var(--en); letter-spacing: 0.18em; }
+#endnotes b { display: block; font: 700 20px/1.9 var(--jp); letter-spacing: 0.1em; }
 
 #grain { pointer-events: none; mix-blend-mode: multiply; opacity: 0.55; }
 
