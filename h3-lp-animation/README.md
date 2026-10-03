@@ -3,7 +3,9 @@
 LPデザイン（`assets/source.webp`）を、縦型 9:16（1080×1920 / 60fps / 25秒・120BPM）のLP風モーションに仕上げたもの。v2でテンポを上げ、人物写真を作り直した（v1は `index_v1.html`）。
 
 - 完成動画: `out/H3_LP_motion.mp4`（BGM付き）／ `out/h3_lp_motion_silent.mp4`（無音）
-- ブラウザで確認: `index.html` をローカルサーバーで開くとループ再生（`## 構成（v2 / 25秒、カットは120BPMの拍に合わせている）
+- ブラウザで確認: `index.html` をローカルサーバーで開くとループ再生（`npx serve` など。file:// だとWebGLが無効になる）
+
+## 構成（v2 / 25秒、カットは120BPMの拍に合わせている）
 
 | 時間 | 内容 | 動き・つなぎ |
 |------|------|------------|
@@ -21,8 +23,6 @@ LPデザイン（`assets/source.webp`）を、縦型 9:16（1080×1920 / 60fps /
 
 USER VOICE と FAQ は25秒に収めるため外した。
 
-人物＋ボトル、価格カード3枚、追従購入バーが下から出現し、最後は静止 |
-
 ## 素材の作り方（元デザインへの忠実度）
 
 - **写真（v2）**: 元画像の小さい人物写真は拡大すると崩れるため、ヒーローの女性を参照にして Runway（nano-banana-pro）で作り直した（`assets/gen2/`）。横顔・髪と手・艶髪・男性・使い方3ステップ・ガラス器具。
@@ -37,6 +37,6 @@ USER VOICE と FAQ は25秒に収めるため外した。
 
 ```bash
 npm install
-src/render_all.sh          # 4並列でレンダリング → 結合 → BGMを合成
+src/render_all.sh          # 3並列でレンダリング → 結合 → BGMを合成
 node src/render.mjs x 60 --frames 2.0,10.5   # 静止フレームの確認（out/stills/）
 ```
