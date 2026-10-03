@@ -5,3 +5,4 @@ out/seg*
 out/*.log
 out/segs.txt
 out/h3_lp_motion_silent.mp4
+out/score_v*.wav

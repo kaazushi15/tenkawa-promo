@@ -39,8 +39,7 @@ html,body{background:#111;width:1080px;height:1920px;overflow:hidden}
 #sticky .c{margin-left:auto;background:#111;color:#fff;border-radius:999px;height:72px;padding:0 34px;display:flex;align-items:center;gap:16px;font-size:24px;font-weight:700;letter-spacing:.08em}
 #wipeY{position:absolute;inset:0;background:var(--yellow);z-index:70;visibility:hidden}
 #wipeY .bar{position:absolute;left:0;width:1080px;height:14px;background:#111}
-#leak{position:absolute;inset:-10%;z-index:70;pointer-events:none;opacity:0;mix-blend-mode:screen;background:radial-gradient(ellipse 60% 45% at 50% 60%,rgba(255,214,120,.95),rgba(255,190,80,.55) 45%,rgba(255,180,60,0) 75%)}
-#veilW{position:absolute;inset:0;z-index:69;background:#f7f7f6;opacity:0;pointer-events:none}
+#liquid{position:absolute;left:0;top:0;width:1080px;height:1920px;z-index:70;visibility:hidden}
 #flash{position:absolute;inset:0;z-index:80;background:#fff;opacity:0;pointer-events:none}
 #grain{position:absolute;left:0;top:0;width:1080px;height:1920px;z-index:90;pointer-events:none;opacity:.04;mix-blend-mode:multiply}
 
@@ -52,19 +51,19 @@ html,body{background:#111;width:1080px;height:1920px;overflow:hidden}
 #s0 .r1{left:90px;transform-origin:right} #s0 .r2{right:90px;transform-origin:left}
 
 /* S1 hero */
-#s1{background:linear-gradient(180deg,#dfe6e9 0%,#e3e9ec 30%,#e6ebee 100%)}
-#s1 .ph{left:0;top:300px;width:1080px;height:1934px;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 260px)}
-#s1 .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(240,244,246,.35) 0%,rgba(240,244,246,0) 34%,rgba(250,250,250,0) 78%,rgba(250,250,250,.55) 90%,rgba(250,250,250,.8) 100%)}
+#s1{background:#eef2f6}
+#s1 .ph{left:0;top:-40px;width:1080px;height:2010px}
+#s1 .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(246,249,252,.6) 0%,rgba(246,249,252,.35) 26%,rgba(246,249,252,0) 40%,rgba(250,250,250,0) 66%,rgba(250,250,250,.5) 82%,rgba(250,250,250,.8) 100%)}
 #s1 .nav{position:absolute;left:0;top:150px;width:1080px;display:flex;justify-content:center;gap:56px;font-family:var(--en);font-size:25px;letter-spacing:.2em;color:#222}
 #s1 .bigLogo{position:absolute;left:70px;top:214px;width:268px}
 #s1 .hl{position:absolute;left:68px;top:376px;font-size:80px;line-height:1.3;letter-spacing:.12em;font-weight:500}
-#s1 .sub{position:absolute;left:72px;top:612px;font-size:40px;line-height:1.6;letter-spacing:.14em;font-weight:500}
-#s1 .eng{position:absolute;left:74px;top:770px;font-size:27px;letter-spacing:.04em;font-family:var(--en)}
+#s1 .sub{position:absolute;left:72px;top:1500px;font-size:40px;line-height:1.6;letter-spacing:.14em;font-weight:500}
+#s1 .eng{position:absolute;left:74px;top:1660px;font-size:27px;letter-spacing:.04em;font-family:var(--en)}
 #s1 .cta{left:72px;top:1724px;width:400px;height:86px;font-size:29px}
 
 /* S2 concept (kinetic) */
 #s2{background:#f7f7f6}
-#s2 .cimg{left:0;top:-260px;width:1080px;height:1934px;opacity:0}
+#s2 .strip{position:absolute;top:0;height:1920px;background-size:1080px 1934px;background-image:url(assets/gen2/profile.jpg);will-change:transform}
 #s2 .fade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(247,247,246,0) 45%,rgba(247,247,246,.85) 60%,#f7f7f6 72%);opacity:0}
 #s2 .persp{position:absolute;left:0;top:0;width:1080px;height:1920px;perspective:1600px}
 #s2 .k1{position:absolute;left:0;width:1080px;top:640px;text-align:center;font-size:170px;line-height:1.25;letter-spacing:.04em;font-weight:500;transform-origin:50% 50%;backface-visibility:hidden}
@@ -191,7 +190,7 @@ html,body{background:#111;width:1080px;height:1920px;overflow:hidden}
 
 <!-- S1 HERO -->
 <section class="scene" id="s1">
-  <div class="ph" id="s1ph"><canvas id="heroGL" width="1080" height="1934"></canvas></div>
+  <div class="ph" id="s1ph"><canvas id="heroGL" width="1080" height="1920"></canvas></div>
   <div class="veil"></div>
   <div class="nav" id="s1nav"><span>PRODUCT</span><span>STORY</span><span>SCIENCE</span><span>REVIEW</span><span>BUY</span></div>
   <svg class="bigLogo" id="s1logo" viewBox="0 0 840 420"></svg>
@@ -203,7 +202,7 @@ html,body{background:#111;width:1080px;height:1920px;overflow:hidden}
 
 <!-- S2 CONCEPT -->
 <section class="scene" id="s2">
-  <div class="ph cimg" id="s2img"><img src="assets/img/hero.jpg"></div>
+  <div id="s2strips"></div>
   <div class="fade" id="s2fade"></div>
   <div class="persp">
     <div class="k1" id="s2k1"><span class="ln">シリコン＝</span><span class="ln">悪、</span><div class="strike" id="s2strike"></div></div>
@@ -291,14 +290,15 @@ html,body{background:#111;width:1080px;height:1920px;overflow:hidden}
 
 <div id="hdr"><div class="bd" id="hdrBd"></div><svg class="logo" id="hdrLogo" viewBox="0 0 840 420"></svg><div class="cta pill" id="hdrPill"><span>定期購入</span><span class="en" style="font-weight:600">-20%</span></div></div>
 <div id="sticky"><div class="a">H3を体験する <span class="en" style="font-weight:600">-20%</span></div><div class="b">初回限定 2,980円(税込)<br>送料無料</div><div class="c"><span>カートに入れる</span><span style="font-family:var(--en)">→</span></div></div>
-<div id="veilW"></div>
-<div id="leak"></div>
+<div id="wipeY"><div class="bar" id="wipeBar"></div></div>
+<svg id="liquid" viewBox="0 0 1080 1920"><defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f8dc84"/><stop offset=".5" stop-color="#efc257"/><stop offset="1" stop-color="#e2a832"/></linearGradient></defs><path id="liqPath" fill="url(#lg)"/><path id="liqHi" fill="none" stroke="rgba(255,255,255,.65)" stroke-width="6"/><g id="liqBub"></g></svg>
+<div id="flash"></div>
 <canvas id="grain" width="540" height="960"></canvas>
 </div>
 
 <script>
 /* ---------------------------------------------------------------
-   H3 LP motion v3 — 35s, unhurried editorial pacing. render(t) is pure.
+   H3 LP motion v2 — 25s, 120 BPM (beat = 0.5s). render(t) is pure.
 ---------------------------------------------------------------- */
 const $ = s => document.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -350,6 +350,14 @@ function wipe(el, k, dir = 'l2r') {
 function vlines(el, t, a, step = .25, d = .6) {
   $$('.vl', el).forEach((s, i) => { const k = E.o3(P(t, a + i * step, d)); s.style.clipPath = `inset(0 0 ${(1 - k) * 100}% 0)`; });
 }
+/* decaying camera shake for beat slams */
+const SLAMS = [[4.6, 10], [12.0, 14], [16.0, 6], [16.5, 6], [17.0, 6], [20.3, 16], [9.0, 8]];
+function shake(t) {
+  let x = 0, y = 0;
+  for (const [a, amp] of SLAMS) { const d = t - a; if (d < 0 || d > .5) continue; const e = Math.exp(-d * 11) * amp; x += e * Math.sin(d * 97); y += e * Math.cos(d * 71); }
+  return [x, y];
+}
+
 /* ---------- H3 logo (measured from the design) ---------- */
 const LOGO_PATHS = (() => {
   const a0 = -75 * Math.PI / 180, a1 = 155 * Math.PI / 180;
@@ -427,227 +435,256 @@ function grain(cv, f) {
   g.putImageData(id, 0, 0);
 }
 
-/* ================= TIMELINE (seconds) =================
-   Unhurried pacing: every scene breathes, transitions are dissolves,
-   light leaks and slow page travel — no hard slams. */
-const END = 35.0;
-const WIN = { s0: [0, 3.0], s1: [1.9, 8.7], s2: [7.7, 13.2], s4: [12.1, 17.6], s5: [16.6, 23.0], s6: [22.2, 27.6], s7: [26.6, 31.0], s8: [30.2, 33.0], s9: [32.0, 99] };
+/* ================= TIMELINE (seconds; 120 BPM) ================= */
+const END = 25.0;
+// scene visibility windows
+const WIN = { s0: [0, 1.75], s1: [1.0, 4.65], s2: [4.5, 8.95], s4: [8.85, 12.25], s5: [11.95, 15.4], s6: [15.0, 18.4], s7: [18.0, 20.35], s8: [19.95, 22.2], s9: [21.55, 99] };
 let heroGL, logoS0, logoS1, logoHdr;
 
 function render(t) {
   for (const id in WIN) { const [a, b] = WIN[id]; const el = document.getElementById(id); const v = t >= a && t < b; el.style.visibility = v ? 'visible' : 'hidden'; if (v) FN[id](t); }
+  const [sx, sy] = shake(t);
+  $('#cam').style.transform = `translate3d(${sx}px,${sy}px,0)`;
   overlays(t); header(t);
   grain($('#grain'), Math.floor(t * 30));
 }
 
-/* soft cross-dissolve helper: scene opacity + gentle blur/scale */
-function dissolve(el, t, inA, inD, outA, outD) {
-  const i = E.io3(P(t, inA, inD)), o = outA == null ? 0 : E.io3(P(t, outA, outD));
-  el.style.opacity = i * (1 - o);
-  return [i, o];
-}
-
 function header(t) {
-  const k = E.o3(P(t, 3.0, .9));
-  op($('#hdrLogo'), k); drawLogo(logoHdr, t, 2.9, .1, .8);
-  op($('#hdrPill'), E.o3(P(t, 3.4, .9))); $('#hdrPill').style.transform = `translate3d(0,${(1 - E.o3(P(t, 3.4, .9))) * -14}px,0)`;
-  op($('#hdrBd'), E.io3(P(t, 8.0, .8)));
-  const sk = E.o4(P(t, 34.0, .9));
-  op($('#sticky'), sk); $('#sticky').style.transform = `translate3d(0,${(1 - sk) * 150}px,0)`;
-  $('#hdr').style.visibility = t < 2.8 ? 'hidden' : 'visible';
+  const k = E.o3(P(t, 1.7, .5));
+  op($('#hdrLogo'), k); drawLogo(logoHdr, t, 1.6, .05, .4);
+  const pk = E.back(P(t, 1.9, .5)); op($('#hdrPill'), clamp(P(t, 1.9, .2))); $('#hdrPill').style.transform = `scale(${lerp(.6, 1, pk)})`;
+  op($('#hdrBd'), P(t, 4.7, .3));
+  const sk = E.o4(P(t, 23.3, .5));
+  op($('#sticky'), sk); $('#sticky').style.transform = `translate3d(0,${(1 - sk) * 170}px,0)`;
+  $('#hdr').style.visibility = t < 1.5 ? 'hidden' : 'visible';
 }
 
 function overlays(t) {
-  /* warm amber light leak carrying us from the concept into the product */
-  const lk = Math.sin(Math.PI * P(t, 11.6, 1.6));
-  const leak = $('#leak'); leak.style.opacity = lk * .9;
-  leak.style.transform = `translate3d(${lerp(-120, 120, P(t, 11.6, 1.6))}px,${lerp(80, -60, P(t, 11.6, 1.6))}px,0) scale(${lerp(.8, 1.3, P(t, 11.6, 1.6))})`;
-  /* paper veil for soft dip-to-white moments */
-  const dips = [[7.6, 1.2], [16.4, .9], [32.0, 1.0]];
-  op($('#veilW'), Math.max(0, ...dips.map(([a, d]) => Math.sin(Math.PI * P(t, a, d)) * .85)));
+  /* yellow panel wipe 4.2–4.95 (hero → concept) */
+  const w = $('#wipeY');
+  const inK = E.io4(P(t, 4.2, .35)), outK = E.io4(P(t, 4.6, .35));
+  w.style.visibility = t > 4.2 && t < 4.95 ? 'visible' : 'hidden';
+  w.style.clipPath = `inset(${(1 - inK) * 100}% 0 ${outK * 100}% 0)`;
+  $('#wipeBar').style.top = `${lerp(1920, -20, E.io3(P(t, 4.25, .6)))}px`;
+
+  /* amber liquid 8.5–9.35 (concept → product) */
+  const L = $('#liquid'); const on = t > 8.5 && t < 9.4; L.style.visibility = on ? 'visible' : 'hidden';
+  if (on) {
+    const top = lerp(2000, -260, E.io3(P(t, 8.5, .5))), bot = lerp(2250, -260, E.io3(P(t, 8.85, .5)));
+    const pts = (y, ph, amp) => { const r = []; for (let x = 0; x <= 1080; x += 40) r.push([x, y + Math.sin(x / 140 + t * 9 + ph) * amp + Math.sin(x / 61 - t * 6 + ph) * amp * .35]); return r; };
+    const tp = pts(top, 0, 34), bp = pts(bot, 2, 26).reverse();
+    $('#liqPath').setAttribute('d', 'M' + [...tp, ...bp].map(([x, y]) => `${x} ${y.toFixed(1)}`).join(' L') + ' Z');
+    const wave = (y, ph, amp) => 'M' + pts(y, ph, amp).map(([x, y]) => `${x} ${y.toFixed(1)}`).join(' L');
+    $('#liqHi').setAttribute('d', wave(top + 18, .6, 30));
+    const g = $('#liqBub'); if (!g.childElementCount) for (let i = 0; i < 26; i++) { const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); c.setAttribute('fill', 'none'); c.setAttribute('stroke', 'rgba(255,255,255,.7)'); c.setAttribute('stroke-width', '3'); g.appendChild(c); }
+    [...g.children].forEach((c, i) => { const x = 60 + rnd(i) * 960, r = 6 + rnd(i + 9) * 22, y = top + 160 + rnd(i + 3) * 1500 - (t - 8.5) * (500 + rnd(i + 5) * 700); c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', r); c.style.opacity = y > top + 30 && y < bot - 30 ? 1 : 0; });
+  }
+
+  /* flashes on hard cuts */
+  const f = Math.max(...[12.0, 15.0].map(a => { const d = t - a; return d >= 0 && d < .35 ? (1 - d / .35) ** 2 * .7 : 0; }));
+  op($('#flash'), f);
 }
 
 const FN = {};
 
-/* S0 — intro: the H3 logo is drawn slowly, then dissolves into the KV */
+/* S0 — intro: logo draws, then becomes a window into the hero */
 FN.s0 = t => {
-  drawLogo(logoS0, t, .3, .17, .9);
-  $('#s0r1').style.transform = `scaleX(${E.o4(P(t, .9, 1.0))})`; $('#s0r2').style.transform = `scaleX(${E.o4(P(t, .9, 1.0))})`;
-  rise($('#s0tag'), t, 1.15, .9, 14, 6);
-  const out = E.io3(P(t, 2.0, .9));
-  $('#s0').style.opacity = 1 - out;
-  $('#s0logo').style.transform = `scale(${1 + out * .08})`;
+  drawLogo(logoS0, t, .1, .09, .5);
+  $('#s0r1').style.transform = `scaleX(${E.o4(P(t, .45, .5))})`; $('#s0r2').style.transform = `scaleX(${E.o4(P(t, .45, .5))})`;
+  rise($('#s0tag'), t, .55, .5, 16, 6);
+  const out = E.io3(P(t, 1.05, .25));
+  op($('#s0logo'), 1 - out); op($('#s0tag'), clamp(P(t, .55, .5)) * (1 - E.o3(P(t, 1.1, .3))));
 };
 
-/* S1 — KV: profile portrait, slow push, breeze in the hair */
+/* S1 — hero (revealed through the zooming logo) */
 FN.s1 = t => {
-  const [, o] = dissolve($('#s1'), t, 1.95, 1.0, 7.6, 1.0);
+  const el = $('#s1');
+  if (t < 1.75) {
+    const s = 1 + 85 * E.iexpo(P(t, 1.15, .55)) + 0.0;
+    const w0 = 520, ax = 280 + w0 * 65 / 840, ay = 780 + (w0 / 2) * 200 / 420, w = w0 * s;
+    el.style.webkitMaskImage = LOGO_MASK; el.style.webkitMaskRepeat = 'no-repeat';
+    el.style.webkitMaskSize = `${w}px ${w / 2}px`;
+    el.style.webkitMaskPosition = `${ax - w * 65 / 840}px ${ay - (w / 2) * 200 / 420}px`;
+    el.style.opacity = E.o3(P(t, 1.0, .2));
+  } else { el.style.webkitMaskImage = 'none'; el.style.opacity = 1; }
   const ph = $('#s1ph');
-  const k = E.o3(P(t, 1.95, 6.5));
-  ph.style.transform = `translate3d(${lerp(24, -16, k)}px,${-o * 60}px,0) scale(${lerp(1.12, 1.03, k)})`;
-  ph.style.filter = `blur(${(1 - E.o3(P(t, 1.95, 1.4))) * 14}px)`;
-  heroGL && heroGL.draw(t * .8 + 2.0, 1);
-  rise($('#s1nav'), t, 3.1, .9, -12);
-  drawLogo(logoS1, t, 3.0, .12, .9);
-  chars($('#s1hl'), t, 3.5, .075, .9);
-  lines($('#s1sub'), t, 4.6, .16, 1.0);
-  rise($('#s1en'), t, 5.1, .9, 14);
-  const c = E.o4(P(t, 5.5, .9));
-  op($('#s1cta'), c); $('#s1cta').style.transform = `translate3d(0,${(1 - c) * 22}px,0)`;
+  const out = E.i3(P(t, 4.2, .45));
+  ph.style.transform = `translate3d(${lerp(30, -10, E.o3(P(t, 1.1, 3.4)))}px,${50 - out * 160}px,0) scale(${lerp(1.22, 1.04, E.expo(P(t, 1.1, 2.6)))})`;
+  heroGL && heroGL.draw(t + 2.0, 1);
+  rise($('#s1nav'), t, 1.75, .5, -14);
+  drawLogo(logoS1, t, 1.8, .06, .4);
+  chars($('#s1hl'), t, 2.0, .035, .45);
+  lines($('#s1sub'), t, 2.55, .08, .5);
+  rise($('#s1en'), t, 2.8, .45, 16);
+  const c = E.back(P(t, 3.0, .45));
+  op($('#s1cta'), clamp(P(t, 3.0, .2))); $('#s1cta').style.transform = `translate3d(0,${(1 - c) * 26}px,0) scale(${lerp(.85, 1, c)})`;
 };
 
-/* S2 — "シリコン＝悪、" → strike → turn over → "その常識を、ひっくり返す。" → portrait + copy */
+/* S2 — "シリコン＝悪、" slam → strike → flip to "その常識を、ひっくり返す。" → photo blinds + body */
 FN.s2 = t => {
-  dissolve($('#s2'), t, 7.75, .9, 12.0, 1.1);
-  chars($('#s2k1'), t, 8.15, .09, .8);
-  $('#s2strike').style.transform = `scaleX(${E.io3(P(t, 9.25, .6))})`;
-  const f1 = E.io3(P(t, 9.95, .55)), f2 = E.io3(P(t, 10.35, .7));
-  $('#s2k1').style.transform = `rotateX(${f1 * 90}deg)`; op($('#s2k1'), f1 < 1 ? 1 - f1 * .3 : 0);
+  chars($('#s2k1'), t, 4.6, .055, .32, 'slam');
+  $('#s2strike').style.transform = `scaleX(${E.o4(P(t, 5.25, .25))})`;
+  const f1 = E.i3(P(t, 5.6, .25)), f2 = E.o4(P(t, 5.82, .4));
+  $('#s2k1').style.transform = `rotateX(${f1 * 90}deg)`; op($('#s2k1'), f1 < 1 ? 1 : 0);
   const k2 = $('#s2k2');
-  const mv = E.io3(P(t, 10.95, 1.0));
+  // after the flip the block travels to its reading position above the body copy
+  const mv = E.io4(P(t, 6.35, .6));
   k2.style.opacity = f2 > 0 ? 1 : 0;
   k2.style.transform = `translate3d(${lerp(0, -32, mv)}px,${lerp(0, 460, mv)}px,0) scale(${lerp(1, .56, mv)}) rotateX(${(1 - f2) * -90}deg)`;
-  // portrait dissolves in behind the travelling headline
-  const im = $('#s2img'), ik = E.io3(P(t, 10.9, 1.2));
-  im.style.opacity = ik; im.style.filter = `blur(${(1 - ik) * 12}px)`;
-  im.querySelector('img').style.transform = `scale(${lerp(1.1, 1.02, E.o3(P(t, 10.9, 3)))})`;
-  op($('#s2fade'), E.io3(P(t, 10.9, 1.0)));
-  lines($('#s2body'), t, 11.5, .11, .9);
-  // copy fades as the leak arrives
-  rise($('#s2cta'), t, 11.6, .8, 18);
+  // profile photo arrives as vertical blinds
+  $$('#s2strips .strip').forEach((s, i) => {
+    const k = E.o4(P(t, 6.3 + i * .045, .5));
+    s.style.transform = `scaleY(${k}) translate3d(0,${(1 - k) * (i % 2 ? 40 : -40)}px,0)`;
+    s.style.backgroundPosition = `${-i * 180}px ${lerp(-60, 0, E.o3(P(t, 6.3, 2.6)))}px`;
+  });
+  op($('#s2fade'), E.o3(P(t, 6.4, .5)));
+  lines($('#s2body'), t, 6.85, .06, .45);
+  rise($('#s2cta'), t, 7.35, .4, 20);
 };
 
 /* S4 — product */
 FN.s4 = t => {
-  dissolve($('#s4'), t, 12.2, 1.0, 16.8, .9);
-  const push = lerp(1.0, 1.06, E.io3(P(t, 12.2, 5.4)));
-  $('#s4wall img').style.transform = `scale(${push * 1.02}) translate3d(${Math.sin(t * .35) * 8}px,0,0)`;
-  const r = E.o4(P(t, 12.6, 1.5));
-  const b = $('#s4bottle'); b.style.opacity = E.o3(P(t, 12.6, .8));
-  const bs = lerp(.96, 1, r) * lerp(1, 1.04, E.io3(P(t, 13.6, 3.5)));
-  b.style.transform = `translate3d(0,${(1 - r) * 140}px,0) rotate(${lerp(-3, 0, r)}deg) scale(${bs})`;
-  b.style.filter = '';
-  $('#s4shadow').style.opacity = r * .9; $('#s4shadow').style.transform = `scaleX(${lerp(.7, 1, r)})`;
-  const sw = P(t, 13.8, 1.8);
-  $('#s4shine').style.background = `linear-gradient(100deg,rgba(255,255,255,0) ${sw * 140 - 40}%,rgba(255,247,220,.6) ${sw * 140 - 25}%,rgba(255,255,255,0) ${sw * 140 - 10}%)`;
-  lines($('#s4name'), t, 13.2, .14, .9);
-  op($('#s4vol'), E.o3(P(t, 13.7, .8)));
-  vlines($('#s4v'), t, 13.6, .45, 1.1);
-  op($('#s4name'), 1); op($('#s4v'), 1);
-  const cv = $('#s4bub'); cv.getContext('2d').clearRect(0, 0, 1080, 1920);
+  const push = lerp(1.0, 1.07, E.io3(P(t, 9.0, 3)));
+  $('#s4wall img').style.transform = `scale(${push * 1.02}) translate3d(${Math.sin(t * .4) * 8}px,0,0)`;
+  const r = E.o5(P(t, 8.95, .7));
+  const rot = lerp(-6, 0, E.back(P(t, 8.95, .7)));
+  const zoomOut = E.i4(P(t, 11.75, .5));
+  const bs = lerp(.94, 1, r) * lerp(1, 1.04, E.io3(P(t, 9.6, 2.2))) * (1 + zoomOut * 2.6);
+  const b = $('#s4bottle'); b.style.opacity = clamp(P(t, 8.95, .25));
+  b.style.transform = `translate3d(0,${(1 - r) * 260 - zoomOut * 120}px,0) rotate(${rot}deg) scale(${bs})`;
+  b.style.filter = zoomOut ? `blur(${zoomOut * 18}px)` : '';
+  $('#s4shadow').style.opacity = r * .9 * (1 - zoomOut); $('#s4shadow').style.transform = `scaleX(${lerp(.6, 1, r)})`;
+  const sw = P(t, 9.55, 1.0);
+  $('#s4shine').style.background = `linear-gradient(100deg,rgba(255,255,255,0) ${sw * 140 - 40}%,rgba(255,247,220,.7) ${sw * 140 - 25}%,rgba(255,255,255,0) ${sw * 140 - 10}%)`;
+  lines($('#s4name'), t, 9.25, .08, .5);
+  rise($('#s4vol'), t, 9.5, .4, 12);
+  vlines($('#s4v'), t, 9.35, .25, .6);
+  const fadeAll = 1 - E.o3(P(t, 11.8, .3));
+  op($('#s4name'), fadeAll); op($('#s4v'), fadeAll); op($('#s4vol'), clamp(P(t, 9.5, .4)) * fadeAll);
+  // amber bubbles drifting up after the liquid
+  const cv = $('#s4bub'), g = cv.getContext('2d'); g.clearRect(0, 0, 1080, 1920);
+  const bk = 1 - P(t, 9.6, .9);
+  if (bk > 0) for (let i = 0; i < 22; i++) {
+    const x = 120 + rnd(i + 40) * 840, y = 1900 - (t - 8.9) * (420 + rnd(i + 41) * 600) - rnd(i + 42) * 500, rr = 5 + rnd(i + 43) * 16;
+    g.globalAlpha = bk * .8; g.strokeStyle = 'rgba(233,181,63,.9)'; g.lineWidth = 3; g.beginPath(); g.arc(x, y, rr, 0, 7); g.stroke();
+  }
+  g.globalAlpha = 1;
 };
 
-/* S5 — values: each portrait breathes for ~1.6s, soft parallax cross-dissolves, then a triptych */
+/* S5 — values on the beat: 01 / 02 / 03 whip-pans, then a triptych */
 FN.s5 = t => {
-  dissolve($('#s5'), t, 16.7, .8, null);
-  const starts = [16.7, 18.3, 19.9];
+  const starts = [12.0, 12.85, 13.7];
   $$('#s5 .panel').forEach((p, i) => {
-    const a = starts[i], next = starts[i + 1] ?? 21.5;
-    const vis = t >= a - .1 && t < next + .7;
+    const a = starts[i], next = starts[i + 1] ?? 14.55;
+    const vis = t >= a - .12 && t < next + .12;
     p.style.visibility = vis ? 'visible' : 'hidden'; if (!vis) return;
-    const inK = E.io3(P(t, a, .8)), outK = E.io3(P(t, next, .7));
+    const inK = E.o4(P(t, a - .12, .3)), outK = E.i3(P(t, next - .12, .24));
+    const x = (1 - inK) * 1080 - outK * 1080;
+    p.style.transform = `translate3d(${x}px,0,0) skewX(${((1 - inK) - outK) * -8}deg)`;
+    p.style.filter = (1 - inK) + outK > .02 ? `blur(${((1 - inK) + outK) * 16}px)` : '';
     p.style.zIndex = i + 1;
-    p.style.opacity = i === 0 ? 1 : inK;
-    p.style.transform = `translate3d(${(1 - inK) * (i === 0 ? 0 : 90) - outK * 60}px,0,0)`;
-    p.style.filter = '';
-    p.querySelector('img').style.transform = `scale(${lerp(1.1, 1.02, E.o3(P(t, a, 2.4)))})`;
-    const n = p.querySelector('.num'), kn = E.o4(P(t, a + .2, .9));
-    n.style.opacity = kn; n.style.transform = `translate3d(0,${(1 - kn) * 30}px,0)`; n.style.clipPath = `inset(${(1 - kn) * 100}% 0 0 0)`;
-    rise(p.querySelector('.ttl'), t, a + .4, .8, 22, 6);
-    rise(p.querySelector('.cap'), t, a + .6, .8, 14);
+    p.querySelector('img').style.transform = `scale(${lerp(1.14, 1.04, E.o3(P(t, a, 1.0)))})`;
+    const n = p.querySelector('.num'), kn = E.o4(P(t, a + .05, .3));
+    n.style.opacity = clamp(P(t, a + .05, .1)); n.style.transform = `scale(${lerp(1.5, 1, kn)})`; n.style.transformOrigin = '0 100%';
+    n.style.clipPath = `inset(${(1 - kn) * 100}% 0 0 0)`;
+    rise(p.querySelector('.ttl'), t, a + .14, .35, 26, 8);
+    rise(p.querySelector('.cap'), t, a + .24, .35, 16);
   });
-  const tr = $('#s5trip'); const vis = t >= 21.4; tr.style.visibility = vis ? 'visible' : 'hidden';
+  const tr = $('#s5trip'); const vis = t >= 14.43; tr.style.visibility = vis ? 'visible' : 'hidden';
   if (vis) {
-    tr.style.zIndex = 9; tr.style.opacity = E.io3(P(t, 21.4, .6));
-    $$('#s5 .tcol').forEach((c, i) => { const k = E.o4(P(t, 21.45 + i * .12, .9)); c.style.transform = `translate3d(0,${(1 - k) * (i % 2 ? -1 : 1) * 160}px,0)`; c.style.opacity = k; c.querySelector('img').style.transform = `scale(${lerp(1.15, 1.04, E.o3(P(t, 21.45, 1.6)))})`; });
-    $$('#s5 .tlab').forEach((l, i) => rise(l, t, 21.7 + i * .12, .7, 16));
-    tr.style.transform = `translate3d(0,${-E.io3(P(t, 22.3, .9)) * 1920}px,0)`;
+    tr.style.zIndex = 9;
+    $$('#s5 .tcol').forEach((c, i) => { const k = E.o5(P(t, 14.45 + i * .07, .45)); c.style.transform = `translate3d(0,${(1 - k) * (i % 2 ? -1 : 1) * 1500}px,0)`; c.querySelector('img').style.transform = `scale(${lerp(1.2, 1.05, E.o3(P(t, 14.45, 1)))})`; });
+    $$('#s5 .tlab').forEach((l, i) => rise(l, t, 14.65 + i * .07, .35, 20));
+    // exit: page travels up into SCIENCE
+    tr.style.transform = `translate3d(0,${-E.io4(P(t, 14.95, .45)) * 1920}px,0)`;
   }
 };
 
-/* S6 — science (slow page travel in and out) */
+/* S6 — science */
 FN.s6 = t => {
-  const enter = E.io3(P(t, 22.3, .9));
-  $('#s6').style.transform = `translate3d(0,${(1 - enter) * 1920 - E.io3(P(t, 26.7, .9)) * 1920}px,0)`;
-  $('#s6glass img').style.transform = `scale(${lerp(1.12, 1.03, E.o3(P(t, 22.3, 4.5)))})`;
-  const sh = P(t, 22.9, 2.4); $('#s6shim').style.transform = `translateX(${lerp(-70, 70, E.io3(sh))}%)`; $('#s6shim').style.opacity = Math.sin(sh * Math.PI);
-  rise($('#s6chap'), t, 22.9, .7, 10);
-  lines($('#s6sci'), t, 23.0, .14, .9);
-  lines($('#s6why'), t, 23.35, .12, .8);
-  rise($('#s6fut'), t, 23.6, .7, 12); rise($('#s6cta'), t, 23.8, .7, 12);
-  vlines($('#s6v'), t, 24.0, .45, 1.0);
+  const enter = E.io4(P(t, 14.95, .45));
+  $('#s6').style.transform = `translate3d(0,${(1 - enter) * 1920 - E.io4(P(t, 17.95, .4)) * 1920}px,0)`;
+  $('#s6glass img').style.transform = `scale(${lerp(1.15, 1.04, E.o3(P(t, 15.0, 3)))})`;
+  const sh = P(t, 15.3, 1.6); $('#s6shim').style.transform = `translateX(${lerp(-70, 70, E.io3(sh))}%)`; $('#s6shim').style.opacity = Math.sin(sh * Math.PI);
+  rise($('#s6chap'), t, 15.2, .4, 10);
+  lines($('#s6sci'), t, 15.25, .08, .5);
+  lines($('#s6why'), t, 15.45, .07, .45);
+  rise($('#s6fut'), t, 15.6, .4, 12); rise($('#s6cta'), t, 15.7, .4, 12);
+  vlines($('#s6v'), t, 15.85, .3, .6);
   $$('#s6 .hrow').forEach((r, i) => {
-    const a = 24.3 + i * .5;
-    const H = r.querySelector('.H'), kh = E.o4(P(t, a, .8));
-    H.style.opacity = kh; H.style.transform = `translate3d(0,${(1 - kh) * 30}px,0)`; H.style.filter = `blur(${(1 - kh) * 6}px)`;
-    rise(r.querySelector('.lb'), t, a + .15, .7, 12); rise(r.querySelector('.ds'), t, a + .28, .7, 10);
-    const ru = r.querySelector('.rule'); if (ru) ru.style.transform = `scaleX(${E.io3(P(t, a + .2, .8))})`;
-    const ph = r.querySelector('.ph'), kp = E.io3(P(t, a + .25, .8)); wipe(ph, kp, 'l2r');
-    ph.querySelector('img').style.transform = `scale(${1.15 - .1 * E.o3(P(t, a + .25, 2))})`;
+    const a = 16.0 + i * .5;
+    const H = r.querySelector('.H'), kh = E.o4(P(t, a, .3));
+    H.style.opacity = clamp(P(t, a, .08)); H.style.transform = `scale(${lerp(1.6, 1, kh)})`; H.style.transformOrigin = '30% 70%'; H.style.filter = `blur(${(1 - kh) * 10}px)`;
+    rise(r.querySelector('.lb'), t, a + .08, .35, 14); rise(r.querySelector('.ds'), t, a + .15, .35, 10);
+    const ru = r.querySelector('.rule'); if (ru) ru.style.transform = `scaleX(${E.io3(P(t, a + .1, .45))})`;
+    const ph = r.querySelector('.ph'), kp = E.io4(P(t, a + .12, .4)); wipe(ph, kp, 'l2r');
+    ph.querySelector('img').style.transform = `scale(${1.2 - .12 * E.o3(P(t, a + .12, 1.2))})`;
   });
 };
 
-/* S7 — how to use */
+/* S7 — how to use: three columns rise on the beat */
 FN.s7 = t => {
-  const enter = E.io3(P(t, 26.7, .9));
+  const enter = E.io4(P(t, 17.95, .4));
   $('#s7').style.transform = `translate3d(0,${(1 - enter) * 1920}px,0)`;
-  dissolve($('#s7'), t, 26.6, .01, 30.2, .8);
-  lines($('#s7ttl'), t, 27.2, .14, .8);
+  lines($('#s7ttl'), t, 18.1, .08, .45);
   $$('#s7 .col').forEach((c, i) => {
-    const a = 27.4 + i * .35, k = E.o4(P(t, a, .9));
+    const a = 18.25 + i * .25, k = E.o5(P(t, a, .45));
     c.style.clipPath = `inset(${(1 - k) * 100}% 0 0 0)`;
-    c.querySelector('img').style.transform = `translate3d(0,${(1 - k) * 100}px,0) scale(${lerp(1.12, 1.03, E.o3(P(t, a, 2.4)))})`;
+    c.querySelector('img').style.transform = `translate3d(0,${(1 - k) * 160}px,0) scale(${lerp(1.18, 1.04, E.o3(P(t, a, 1.6)))})`;
   });
   $$('#s7 .lb').forEach((l, i) => {
-    const a = 27.65 + i * .35;
-    rise(l.querySelector('.n'), t, a, .7, 16); l.querySelector('.u').style.transform = `scaleX(${E.io3(P(t, a + .15, .6))})`;
-    rise(l.querySelector('.w'), t, a + .15, .7, 12); rise(l.querySelector('.d'), t, a + .25, .7, 10);
+    const a = 18.4 + i * .25;
+    rise(l.querySelector('.n'), t, a, .35, 20); l.querySelector('.u').style.transform = `scaleX(${E.io3(P(t, a + .08, .35))})`;
+    rise(l.querySelector('.w'), t, a + .08, .35, 14); rise(l.querySelector('.d'), t, a + .14, .35, 10);
   });
 };
 
-/* S8 — OLD vs NEW: halves glide together, then NEW gently fills the screen */
+/* S8 — OLD vs NEW slam, then NEW takes the whole screen */
 FN.s8 = t => {
-  dissolve($('#s8'), t, 30.25, .5, null);
-  const k = E.o4(P(t, 30.3, 1.0));
-  const take = E.io3(P(t, 31.9, .9));
+  const k = E.o4(P(t, 20.0, .3));
+  const take = E.io4(P(t, 21.15, .45));
   const old = $('#s8old'), neo = $('#s8neo');
-  old.style.transform = `translate3d(${(1 - k) * -300 - take * 560}px,0,0)`;
+  old.style.transform = `translate3d(${(1 - k) * -560 - take * 560}px,0,0)`;
   neo.style.left = `${lerp(540, 0, take)}px`; neo.style.width = `${lerp(540, 1080, take)}px`;
-  neo.style.transform = `translate3d(${(1 - k) * 300}px,0,0)`;
+  neo.style.transform = `translate3d(${(1 - k) * 560}px,0,0)`;
   neo.querySelector('img').style.width = `${lerp(800, 1080, take)}px`;
-  $('#s8old img').style.transform = `scale(1.05)`; $('#s8neo img').style.transform = `scale(1.05)`;
-  const km = E.o4(P(t, 30.9, .8)); const mk = $('#s8mark');
-  op(mk, km * (1 - take)); mk.style.transform = `scale(${lerp(.85, 1, km)})`;
+  $('#s8old img').style.transform = `translate3d(${(1 - k) * 160}px,0,0) scale(1.05)`;
+  $('#s8neo img').style.transform = `translate3d(${(1 - k) * -160}px,0,0) scale(1.05)`;
+  const km = E.back(P(t, 20.25, .4)); const mk = $('#s8mark');
+  op(mk, clamp(P(t, 20.25, .15)) * (1 - take)); mk.style.transform = `scale(${lerp(.5, 1, km)})`;
   $$('#s8 .half').forEach((h, i) => {
-    rise(h.querySelector('.k'), t, 30.8 + i * .15, .7, 16);
-    rise(h.querySelector('.j'), t, 30.95 + i * .15, .7, 12);
-    $$('.w', h).forEach(w => rise(w, t, 31.1 + i * .15, .8, 18));
+    rise(h.querySelector('.k'), t, 20.3 + i * .06, .35, 18);
+    rise(h.querySelector('.j'), t, 20.38 + i * .06, .35, 12);
+    $$('.w', h).forEach(w => rise(w, t, 20.5 + i * .06, .4, 22));
   });
-  $('#s8neo .txt').style.left = `${lerp(56, 300, take)}px`;
+  const nt = $('#s8neo .txt'); nt.style.left = `${lerp(56, 300, take)}px`;
 };
 
-/* S9 — closing */
+/* S9 — closing (iris out of the yellow) */
 FN.s9 = t => {
-  $('#s9').style.clipPath = 'none';
-  dissolve($('#s9'), t, 32.3, .9, null);
-  $('#s9por img').style.transform = `scale(${lerp(1.1, 1.0, E.o3(P(t, 32.2, 3)))})`;
-  const kb = E.o4(P(t, 32.6, 1.2)), b = $('#s9bottle');
-  b.style.opacity = E.o3(P(t, 32.6, .7)); b.style.transform = `translate3d(0,${(1 - kb) * 90}px,0)`;
-  chars($('#s9copy'), t, 32.8, .045, .7);
-  $$('#s9 .card').forEach((c, i) => { const k = E.o4(P(t, 33.4 + i * .15, .8)); c.style.opacity = k; c.style.transform = `translate3d(0,${(1 - k) * 40}px,0)`; });
-  const pulse = P(t, 34.4, .01) * (.5 - .5 * Math.cos((t - 34.4) * 4.2));
-  $('#s9 .c1 .b').style.boxShadow = `0 0 0 ${pulse * 8}px rgba(255,232,52,${.5 * (1 - pulse)})`;
+  const ir = E.io4(P(t, 21.55, .55));
+  $('#s9').style.clipPath = ir < 1 ? `circle(${ir * 1200}px at 540px 960px)` : 'none';
+  $('#s9por img').style.transform = `scale(${lerp(1.16, 1.0, E.o3(P(t, 21.55, 3)))})`;
+  const kb = E.o5(P(t, 21.85, .7)), b = $('#s9bottle');
+  b.style.opacity = clamp(P(t, 21.85, .25)); b.style.transform = `translate3d(0,${(1 - kb) * 120}px,0) rotate(${lerp(5, 0, E.back(P(t, 21.85, .7)))}deg)`;
+  chars($('#s9copy'), t, 22.05, .03, .4);
+  $$('#s9 .card').forEach((c, i) => { const k = E.back(P(t, 22.75 + i * .2, .45)); c.style.opacity = clamp(P(t, 22.75 + i * .2, .15)); c.style.transform = `translate3d(0,${(1 - k) * 60}px,0) scale(${lerp(.9, 1, k)})`; });
+  const pulse = P(t, 23.9, .01) * (.5 - .5 * Math.cos((t - 23.9) * 6.283));
+  $('#s9 .c1 .b').style.boxShadow = `0 0 0 ${pulse * 9}px rgba(255,232,52,${.55 * (1 - pulse)})`;
 };
 
 /* ---------- boot ---------- */
 async function boot() {
   logoS0 = buildLogo($('#s0logo')); logoS1 = buildLogo($('#s1logo')); logoHdr = buildLogo($('#hdrLogo'));
   splitChars($('#s1hl')); splitChars($('#s2k1')); splitChars($('#s9copy'));
+  const strips = $('#s2strips');
+  for (let i = 0; i < 6; i++) { const d = document.createElement('div'); d.className = 'strip'; d.style.left = `${i * 180}px`; d.style.width = '181px'; d.style.transformOrigin = i % 2 ? '50% 100%' : '50% 0%'; strips.appendChild(d); }
   await Promise.all($$('img').map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; })));
+  await new Promise(r => { const i = new Image(); i.onload = i.onerror = r; i.src = 'assets/gen2/profile.jpg'; });
   await document.fonts.ready;
   try {
-    const hero = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = 'assets/gen2/profile.jpg'; });
-    heroGL = new Breeze($('#heroGL'), hero, { amp: 3.6, face: [.83, .41, .13, .13], freq: 2.2 });
+    const hero = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = 'assets/img/hero.jpg'; });
+    heroGL = new Breeze($('#heroGL'), hero, { amp: 3.4, face: [.43, .49, .17, .13], freq: 2.4 });
   } catch (e) { console.error('webgl', e); }
   window.READY = true;
   if (!/render/.test(location.search)) { const t0 = performance.now(); const tick = () => { render(((performance.now() - t0) / 1000) % END); requestAnimationFrame(tick); }; tick(); }
