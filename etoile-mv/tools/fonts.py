@@ -27,8 +27,23 @@ JP = [  # every Japanese string in the key visual
     "食事サポート", "無理なく続ける", "食習慣づくり", "手ぶらOK", "レンタル・アメニティ", "完備",
     "心斎橋駅 徒歩5分", "梅田駅 徒歩7分", "女性トレーナーのみ在籍", "無料カウンセリング受付中",
 ]
-EN = ["START 9.01 GOAL 12.25 X'mas", "DIET JOURNEY", "MY FUTURE IS MINE.", "ETOILE GYM", "・ →"]
-MONO = ["for the best me."]
+JP += [  # making-of (making.html)
+    "Étoile 15秒Webプロモ", "ができるまで", "原画", "切り抜き", "動かす", "キー抜き", "構成", "組み立て", "音", "書き出し",
+    "画像の文字を、ぜんぶ書き出す", "女性だけを切り抜いて、緑の上へ", "緑の上で、15秒歩いてもらう", "緑を消して、透明に",
+    "1小節＝1シーン。8シーンで15秒", "背景・路線図・文字・キャラを重ねる", "曲も効果音も、コードで鳴らす", "1コマずつ撮って、450枚をMP4に",
+    "文字 0123456789行を書き出し", "緑背景", "元の映像", "切り抜き後", "マスク", "頭の位置を追って、ブレを補正",
+    "つかみ", "スタート", "案内板", "どん底", "転機", "支える駅", "ゴール", "エンド", "8小節 ＝ 15.0秒", "サビ",
+    "背景", "路線図", "文字", "キャラ", "光・粒子", "完成",
+    "DIET JOURNEY", "for the best me.", "MY FUTURE IS MINE.", "ETOILE GYM",  # the inventory lists these in Noto too
+]
+EN = ["START 9.01 GOAL 12.25 X'mas", "DIET JOURNEY", "MY FUTURE IS MINE.", "ETOILE GYM", "・ →",
+      "HOW IT'S MADE", "MAKING OF", "KEY VISUAL", "CUT OUT", "ANIMATE", "KEY OUT", "STORYBOARD", "COMPOSE", "SOUND", "EXPORT",
+      "Claude Code", "Python", "MiniMax H3", "ffmpeg", "HTML", "CSS", "JavaScript", "Web Audio API", "Playwright",
+      "Built with Claude Code", "128 BPM", "15s ・ 2K", "MP4", "1920×1080 ・ 30fps ・ 15s", "NOW PLAYING ▶",
+      "HOOK START BOARD LOW TURN SUPPORT GOAL END", "KEY VISUAL 15s WEB PROMO", "DRUMS BASS KEYS BELL", "STEP 0123456789 / +"]
+MONO = ["for the best me.", "walks in profile toward the RIGHT", "4.5-7s: slows down, looks down", "7-9s: clenches one fist",
+        "9-11s: smiles, walks briskly", "background: flat lime green", "function render(t) {", "  cam.zoom = lens(t);",
+        "  board.flap(t);", "  woman.seek(clipTime(t));", "  type.draw(t);", "}", "0123456789 / FRAMES"]
 SERIF = ["Étoile"]
 
 JOBS = [("Noto Sans JP", "900", JP, "noto-900"), ("Noto Sans JP", "700", JP, "noto-700"),

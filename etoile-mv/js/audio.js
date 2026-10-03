@@ -4,7 +4,7 @@
  * bounces the same graph for the MP4 export. */
 window.KoiAudio = (() => {
   "use strict";
-  const BEAT = 60 / 128, BAR = 4 * BEAT, END = 15;
+  const BEAT = 60 / 128, BAR = 4 * BEAT, DEFAULT_END = 15;
   const midi = (n) => 440 * 2 ** ((n - 69) / 12);
 
   // Chords per half bar (two beats). D major, the classic IV–V–iii–vi ("王道進行") pull.
@@ -21,6 +21,7 @@ window.KoiAudio = (() => {
 
   function schedule(ctx, dest, t0, cues) {
     const at = (t) => t0 + t;
+    const END = cues.dur || DEFAULT_END;
     // arrangement per piece: where the groove drives, where it drops to half time, the chords
     const MUS = cues.music || {};
     const LIFT = MUS.lift || [5.6, 8.1], HOLD = MUS.hold || [8.4, 10.3], PR = MUS.prog || PROG;
@@ -233,8 +234,40 @@ window.KoiAudio = (() => {
       }
     }
 
+    // ---------------------------------------------------------- Étoile making-of (30 s, 16 bars)
+    function scoreMaking(M) {
+      const PR = [...Array(28)].map((_, h) => ["D", "A", "Bm", "G"][h % 4]).concat(["G", "A"]);
+      const MEL = { 26: [81, 0, 78, 81], 27: [83, 81, 76, 0], 28: [86, 83, 81, 0], 29: [90, 0, 88, 86] };
+      const outro = (t) => t >= M.outro;
+      swell(CH.D.ep, 0, 1.85, 0.6);
+      for (let h = 2; h < 30; h++) {
+        const c = CH[PR[h]], t = h * 2 * BEAT;
+        swell(c.ep, t, 2 * BEAT - 0.02, outro(t) ? 0.5 : 0.36);
+        for (const off of [0, 0.75, 1.5]) for (const n of c.ep) ep(n, t + off * BEAT, off === 1.5 ? 0.42 : 0.26, (outro(t) ? 0.62 : 0.46) * (off ? 0.8 : 1));
+        for (let e = 0; e < 4; e++) bass(c.bass + (e % 2 && outro(t) ? 12 : 0), t + e * BEAT / 2, BEAT / 2 * 0.85, e === 0 ? 0.95 : 0.7);
+        const pat = [1, 0, 1, 1, 0, 1, 1, 0];
+        for (let k = 0; k < 8; k++) if (pat[k]) mute(c.ep[k % 2 ? 2 : 0] + 12, t + k * BEAT / 4, k % 4 === 0 ? 0.9 : 0.55);
+        (MEL[h] || []).forEach((n, k) => { if (n) { bell(n, t + k * BEAT / 2, 0.42); ep(n, t + k * BEAT / 2, 0.2, 0.3); } });
+      }
+      for (let b = 4; b < 60; b++) {
+        const t = b * BEAT, inBar = b % 4, o = outro(t);
+        if (inBar === 0 || inBar === 2 || o) kick(t, inBar === 0 ? 1 : 0.85);
+        if (inBar === 1 || inBar === 3) { snare(t, 0.8); clap(t, o ? 1 : 0.6); }
+        for (let k = 0; k < (o ? 4 : 2); k++) hat(t + k * BEAT / (o ? 4 : 2), k === 0 ? 0.75 : 0.45);
+      }
+      crash(1.875, 0.7); crash(M.outro, 1);
+      for (let k = 0; k < 8; k++) snare(M.outro - 1 + k / 8, 0.3 + k * 0.06);
+      const F = M.final; // the last chord rings to the end
+      kick(F, 1); crash(F, 0.9);
+      for (const n of CH.D.ep) ep(n, F, END - F, 0.6, keys, 0.06);
+      swell([50, 54, 57, 62, 64, 69], F, END - F + 0.2, 0.9);
+      bass(38, F, 1.8, 1);
+      [81, 86, 88, 90, 93].forEach((n, i) => bell(n, F + 0.06 + i * 0.08, 0.45));
+    }
+
     // ---------------------------------------------------------- music
-    if (cues.etoile) scoreEtoile(cues.etoile);
+    if (cues.makingEtoile) scoreMaking(cues.makingEtoile);
+    else if (cues.etoile) scoreEtoile(cues.etoile);
     else {
     // intro: a soft chord swell under the opening line
     swell([55, 59, 62, 66], 0.0, 1.85, 0.85);
@@ -292,7 +325,25 @@ window.KoiAudio = (() => {
 
     }
 
-    if (cues.etoile) {
+    if (cues.makingEtoile) {
+      // Étoile making-of: the camera rides to each step; each demo gets its own little sounds
+      const M = cues.makingEtoile, S = M.steps, NOTES = [74, 76, 78, 81, 83, 86, 88, 90];
+      [0.1, 0.22, 0.34].forEach((t) => { blip(t, 420, 210, 0.1, 0.18, sfx, "triangle"); noiseHit(t, 0.05, "bandpass", 2200, 1, 0.12, sfx); });
+      for (let i = 0; i < 8; i++) click(0.5 + i * 0.06, 0.45);
+      S.forEach((t, i) => { sweep(t - 0.22, 0.36, 600, 3800, 0.15); bell(NOTES[i], t + 0.05, 0.8); click(t + 0.05, 1); });
+      sweep(S[0] + 0.35, 0.6, 2400, 900, 0.07);
+      for (let k = 0; k < M.boxes; k++) click(S[0] + 0.5 + k * 0.04, 0.35);
+      [0.2, 0.8, 1.4].forEach((d, i) => blip(S[1] + d, 500 + i * 200, 1100 + i * 250, 0.09, 0.15, sfx, "triangle"));
+      for (let i = 0; i < 26; i++) noiseHit(S[2] + 0.15 + i * 0.032, 0.014, "highpass", 3200, 1, 0.12, sfx);
+      for (let t = S[2] + 1.1; t < S[2] + 2.6; t += 0.1) noiseHit(t, 0.02, "bandpass", 5200, 2, 0.08, sfx);
+      sweep(S[3] + 0.25, 0.9, 800, 4800, 0.1); blip(S[3] + 1.2, 900, 1400, 0.08, 0.12);
+      for (let i = 0; i < 8; i++) blip(S[4] + 0.2 + i * BEAT / 2, 600 + i * 60, 900 + i * 60, 0.06, 0.1, sfx, "triangle");
+      sweep(S[5] + 0.08, 0.45, 300, 2600, 0.18); blip(S[5] + 1.95, 160, 70, 0.2, 0.36);
+      for (let t = S[7] + 0.1; t < S[7] + 1.6; t += 0.045) click(t, 0.28);
+      blip(S[7] + 1.72, 330, 660, 0.14, 0.24, sfx, "triangle");
+      sweep(M.outro - 0.3, 0.42, 900, 5200, 0.22);
+      M.recap.forEach((t, i) => bell(NOTES[i], t, 0.45));
+    } else if (cues.etoile) {
       // Étoile: sound design for every cut and graphic (the score is scoreEtoile above)
       const T = cues.etoile;
       const hit = (t, v = 1) => { blip(t, 140, 48, 0.24, 0.5 * v); noiseHit(t, 0.07, "bandpass", 1800, 0.8, 0.22 * v, sfx); };
@@ -412,7 +463,7 @@ window.KoiAudio = (() => {
   }
 
   async function renderOffline(cues, sampleRate = 48000) {
-    const ctx = new OfflineAudioContext(2, Math.ceil(sampleRate * END), sampleRate);
+    const ctx = new OfflineAudioContext(2, Math.ceil(sampleRate * (cues.dur || DEFAULT_END)), sampleRate);
     schedule(ctx, ctx.destination, 0, cues);
     return ctx.startRendering();
   }

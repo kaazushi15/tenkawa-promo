@@ -1,0 +1,107 @@
+/* HOW IT'S MADE — the making-of, drawn in the spot's own vocabulary (mv.css is loaded first). */
+#world { transform-origin: 0 0; }
+#bug i.en { font-family: var(--en); font-weight: 800; letter-spacing: 0.3em; font-size: 13px; }
+.mk-panel { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+
+/* stations on the production line */
+.mk-st { position: absolute; display: flex; flex-direction: column; align-items: center; padding: 9px 18px 8px; border-radius: 14px;
+  border: 4px solid var(--white); white-space: nowrap; transform-origin: 50% 0; }
+.mk-st b { font-size: 28px; font-weight: 900; line-height: 1.1; letter-spacing: 0.06em; }
+.mk-st i { font: normal 800 12px/1.2 var(--en); letter-spacing: 0.18em; margin-top: 3px; }
+
+/* chips and pills */
+.mk-chiprow { position: absolute; display: flex; gap: 12px; }
+.mk-chip { position: relative; padding: 11px 22px 10px; border-radius: 999px; white-space: nowrap; background: var(--white); color: var(--magenta);
+  font: 800 24px/1 var(--en); letter-spacing: 0.04em; box-shadow: 0 6px 0 rgba(90, 0, 36, 0.22); }
+.mk-chip.navy { background: var(--navy); color: var(--white); }
+.mk-pill { position: absolute; padding: 7px 14px 6px; border-radius: 10px; white-space: nowrap; background: var(--navy); color: var(--white);
+  font: 900 20px/1 var(--jp); letter-spacing: 0.08em; transform-origin: 0 100%; }
+.mk-pill.en { font-family: var(--en); font-weight: 800; letter-spacing: 0.14em; }
+.mk-pill.white { background: var(--white); color: var(--magenta); }
+.ky.outline .line { color: transparent; -webkit-text-stroke: 4px var(--white); }
+
+/* cards */
+.mk-card { position: absolute; border-radius: 20px; overflow: hidden; background: var(--white);
+  box-shadow: 0 0 0 6px var(--white), 0 24px 48px rgba(70, 0, 28, 0.32); }
+.mk-card img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+.mk-checker { position: absolute; inset: 0; background: repeating-conic-gradient(#ece6ea 0 25%, #ffffff 0 50%) 0 0 / 32px 32px; }
+.mk-scan { position: absolute; background: var(--white); box-shadow: 0 0 24px 8px rgba(255, 255, 255, 0.85); border-radius: 4px; }
+.mk-box { position: absolute; border: 3px solid var(--magenta); background: rgba(203, 34, 103, 0.18); border-radius: 4px; box-shadow: 0 0 0 2px rgba(255,255,255,0.9); }
+
+/* text inventory */
+.mk-inv { position: absolute; border-radius: 20px; background: var(--navy); overflow: hidden; box-shadow: 0 20px 40px rgba(70, 0, 28, 0.3); }
+.mk-inv .count { position: absolute; left: 30px; top: 40px; white-space: nowrap; font-size: 30px; font-weight: 900; letter-spacing: 0.04em; }
+.mk-inv .count em { font: normal 800 72px/1 var(--en); color: var(--blush); margin: 0 8px; vertical-align: -10px; }
+.mk-inv .lines { position: absolute; left: 400px; right: 0; top: 0; bottom: 0; overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.mk-inv .row { position: absolute; left: 0; white-space: nowrap; font-size: 24px; font-weight: 700; letter-spacing: 0.04em; }
+.mk-inv .row span { display: inline-block; padding: 6px 14px; margin-right: 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.1); }
+
+/* prompt bubble */
+.mk-bubble { position: absolute; padding: 26px 34px; border-radius: 26px; background: var(--white); color: var(--navy);
+  font: 400 28px/1.5 "DM Mono", monospace; white-space: pre; box-shadow: 0 18px 36px rgba(70, 0, 28, 0.25); transform-origin: 60px 100%; }
+.mk-bubble::after { content: ""; position: absolute; left: 70px; bottom: -22px; border: 14px solid transparent; border-top: 16px solid var(--white); border-left: 18px solid var(--white); }
+.mk-bubble .caret { display: inline-block; width: 3px; height: 30px; background: var(--magenta); vertical-align: -6px; margin-left: 2px; }
+
+/* film strip */
+.mk-film { position: absolute; border-radius: 18px; background: var(--navy); overflow: hidden; box-shadow: 0 22px 44px rgba(70, 0, 28, 0.32); }
+.mk-film .holes { position: absolute; left: 0; right: 0; height: 26px; padding: 7px 0; background-clip: content-box; opacity: 0.85;
+  background-image: repeating-linear-gradient(90deg, transparent 0 18px, #fffafa 18px 44px, transparent 44px 62px); }
+.mk-film .track { position: absolute; left: 0; top: 52px; height: 225px; }
+.mk-film .track img { position: absolute; top: 0; width: 400px; height: 225px; border-radius: 8px; }
+
+/* drift graph */
+.mk-graph { position: absolute; border-radius: 18px; background: var(--navy); box-shadow: 0 18px 36px rgba(70, 0, 28, 0.3); }
+.mk-graph b { position: absolute; left: 24px; top: 18px; font-size: 22px; font-weight: 900; letter-spacing: 0.04em; white-space: nowrap; }
+
+/* storyboard */
+.mk-thumb { position: absolute; width: 262px; height: 147px; border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 4px var(--white), 0 12px 26px rgba(70, 0, 28, 0.3); }
+.mk-thumb img { width: 100%; height: 100%; display: block; }
+.mk-tlabel { position: absolute; white-space: nowrap; line-height: 1; }
+.mk-tlabel em { font: normal 800 18px/1 var(--en); letter-spacing: 0.12em; margin-right: 10px; }
+.mk-tlabel span { font-size: 20px; font-weight: 900; letter-spacing: 0.04em; }
+.mk-ruler { position: absolute; height: 46px; border-radius: 10px; overflow: hidden; background: rgba(28, 33, 66, 0.55); }
+.mk-ruler i { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(255, 255, 255, 0.5); }
+.mk-ruler .fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--white); opacity: 0.9; transform-origin: 0 50%; }
+.mk-note { position: absolute; white-space: nowrap; font-size: 28px; font-weight: 900; letter-spacing: 0.06em; }
+
+/* compose: exploded layers */
+.mk-scene3d { position: absolute; perspective: 2400px; }
+.mk-stack { position: absolute; left: 80px; top: 120px; width: 880px; height: 495px; transform-style: preserve-3d; }
+.mk-plane { position: absolute; inset: 0; transform-style: preserve-3d; border-radius: 10px; }
+.mk-plane img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 10px; }
+.mk-plane .frame { position: absolute; inset: 0; border: 4px solid rgba(255, 250, 250, 0.9); border-radius: 10px; }
+.mk-plane .mk-pill { left: calc(100% + 26px); top: 38%; font-size: 28px; padding: 10px 20px 9px; }
+.mk-code { position: absolute; padding: 22px 26px; border-radius: 18px; background: var(--navy); color: #f3e9ee;
+  font: 400 21px/1.5 "DM Mono", monospace; white-space: pre; box-shadow: 0 16px 34px rgba(70, 0, 28, 0.3); }
+.mk-code .kw { color: var(--blush); }
+.mk-code .fn { color: #ffe3a3; }
+
+/* sound: piano roll */
+.mk-roll { position: absolute; border-radius: 24px; background: rgba(28, 33, 66, 0.55); border: 4px solid var(--white); overflow: hidden; }
+.mk-roll .lane { position: absolute; left: 0; right: 0; height: 100px; border-top: 2px dashed rgba(255, 250, 250, 0.3); }
+.mk-roll .lane b { position: absolute; left: 22px; top: 36px; font: 800 19px/1 var(--en); letter-spacing: 0.16em; z-index: 2; }
+.mk-roll .track { position: absolute; left: 0; top: 0; height: 100%; }
+.mk-roll .note { position: absolute; border-radius: 5px; background: var(--white); }
+.mk-roll .note.on { background: var(--blush); box-shadow: 0 0 14px 4px rgba(247, 182, 207, 0.8); }
+.mk-roll .sec { position: absolute; top: 10px; white-space: nowrap; font-size: 20px; font-weight: 900; padding: 4px 12px; border-radius: 8px; background: var(--white); color: var(--magenta); }
+.mk-roll .head { position: absolute; top: 0; bottom: 0; width: 6px; background: var(--blush); box-shadow: 0 0 18px 4px rgba(247, 182, 207, 0.7); }
+.mk-eq { position: absolute; width: 22px; border-radius: 6px 6px 3px 3px; background: var(--white); transform-origin: 50% 100%; }
+
+/* export */
+.mk-counter { position: absolute; font: 400 150px/1 "DM Mono", monospace; letter-spacing: 0.02em; }
+.mk-counter small { display: block; margin-top: 10px; font: 800 28px/1 var(--en); letter-spacing: 0.24em; }
+.mk-shot { position: absolute; width: 360px; height: 203px; border-radius: 12px; box-shadow: 0 0 0 5px var(--white), 0 14px 28px rgba(70, 0, 28, 0.3); }
+.mk-file { position: absolute; width: 300px; height: 370px; border-radius: 22px 70px 22px 22px; background: var(--white);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 22px 44px rgba(70, 0, 28, 0.32); }
+.mk-file b { font: 800 96px/1 var(--en); color: var(--magenta); }
+.mk-file svg { width: 92px; height: 70px; }
+.mk-spec { position: absolute; font: 800 26px/1 var(--en); letter-spacing: 0.14em; white-space: nowrap; }
+
+/* outro */
+.mk-player { position: absolute; border-radius: 20px; overflow: hidden; background: #000; box-shadow: 0 0 0 6px var(--white), 0 28px 56px rgba(70, 0, 28, 0.38); }
+.mk-player video { width: 100%; height: 100%; display: block; }
+.mk-toolname { position: absolute; transform: translateX(-50%); font: 800 16px/1 var(--en); letter-spacing: 0.04em; white-space: nowrap; }
+.mk-bignum { position: absolute; font: 800 720px/1 var(--en); color: transparent; -webkit-text-stroke: 4px rgba(255, 250, 250, 0.14); letter-spacing: -0.04em; }
+.wipe { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.wipe .bar { position: absolute; left: 0; width: 1500px; height: 200px; }

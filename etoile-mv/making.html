@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HOW IT'S MADE — Étoile 15s</title>
+<link rel="stylesheet" href="css/mv.css">
+<link rel="stylesheet" href="css/making.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="star" viewBox="-50 -50 100 100"><path d="M0 -50C3 -12 12 -3 50 0C12 3 3 12 0 50C-3 12 -12 3 -50 0C-12 -3 -3 -12 0 -50Z"/></symbol>
+  </defs>
+</svg>
+
+<div id="stage">
+  <div id="bg" class="layer"><div id="bg-glow"></div></div>
+  <div id="bignum" class="layer"></div>
+  <svg id="bgfx" class="abs" width="1920" height="1080"></svg>
+  <div id="world" class="layer"><svg id="world-svg" class="abs" width="1" height="1"></svg></div>
+  <div id="demo" class="layer"></div>
+  <div id="info" class="layer"></div>
+  <div id="type" class="layer"></div>
+  <div id="bug"><b>Étoile</b><i class="en">MAKING OF</i></div>
+  <div id="wipes" class="layer"></div>
+  <div id="vignette" class="layer"></div>
+  <canvas id="grain" class="layer" width="960" height="540"></canvas>
+</div>
+
+<div id="ui"><div id="play"><svg viewBox="0 0 22 22"><path d="M5 3l14 8-14 8Z" fill="currentColor"/></svg><span>PLAY</span></div></div>
+
+<script src="clips/h3.js" onerror="this.remove()"></script>
+<script src="js/audio.js"></script>
+<script src="js/typo.js"></script>
+<script src="js/making.js"></script>
+</body>
+</html>
