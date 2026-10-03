@@ -709,7 +709,13 @@
   const vidReady = (v) => new Promise((r) => {
     if (v.readyState >= 2) r(); else { v.addEventListener("loadeddata", r, { once: true }); v.addEventListener("error", r, { once: true }); }
   });
-  const ready = Promise.all([...imgs, ...fonts, document.fonts.ready, ...(CLIP ? [vidReady(clipVid), vidReady(clipVid2)] : [])]);
+  // narration (js/vo.js from tools/vo.py), decoded once and shared by the player and the export
+  const voReady = !window.ETOILE_VO ? Promise.resolve() : (async () => {
+    const bin = Uint8Array.from(atob(window.ETOILE_VO.data), (c) => c.charCodeAt(0));
+    const ac = new OfflineAudioContext(1, 48000, 48000);
+    CUES.vo = { buffer: await ac.decodeAudioData(bin.buffer), spans: window.ETOILE_VO.spans, gain: 1.15 };
+  })();
+  const ready = Promise.all([...imgs, ...fonts, document.fonts.ready, voReady, ...(CLIP ? [vidReady(clipVid), vidReady(clipVid2)] : [])]);
   window.MV = { DUR, CUES, render, renderAsync, ready, fps: 30, clip: CLIP && CLIP_NAME,
     debug: () => ({ cam: [0, 1.875, 3.75, 5.6, 7.5, 9.4, 11.25, 13].map((t) => [t, Math.round(camX(t))]), goal: GOAL_X }) };
 

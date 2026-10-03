@@ -38,16 +38,18 @@ window.KoiAudio = (() => {
     const fadeOut = ctx.createGain();
     fadeOut.gain.setValueAtTime(1, at(END - 0.06)); fadeOut.gain.linearRampToValueAtTime(0, at(END));
     master.connect(hp).connect(comp).connect(limit).connect(fadeOut).connect(dest);
+    // music and effects go through musicIn, which ducks under the narration (if any)
+    const musicIn = ctx.createGain(); musicIn.connect(master);
 
     const verb = ctx.createConvolver();
     verb.buffer = impulse(ctx, 1.9);
     const verbIn = ctx.createGain(); verbIn.gain.value = 0.32;
-    verbIn.connect(verb).connect(master);
+    verbIn.connect(verb).connect(musicIn);
 
     const bus = (gain, pan = 0, send = 0) => {
       const g = ctx.createGain(); g.gain.value = gain;
       const p = ctx.createStereoPanner(); p.pan.value = pan;
-      g.connect(p).connect(master);
+      g.connect(p).connect(musicIn);
       if (send) { const s = ctx.createGain(); s.gain.value = send; p.connect(s).connect(verbIn); }
       return g;
     };
@@ -215,6 +217,20 @@ window.KoiAudio = (() => {
       swell([50, 54, 57, 62, 64, 69], END_T, END - END_T + 0.2, 0.95);
       bass(38, END_T, 1.8, 1);
       [81, 86, 88, 90, 93].forEach((n, i) => bell(n, END_T + 0.06 + i * 0.08, 0.45));
+    }
+
+    // ---------------------------------------------------------- narration
+    if (cues.vo) {
+      const src = ctx.createBufferSource(); src.buffer = cues.vo.buffer;
+      const hpv = ctx.createBiquadFilter(); hpv.type = "highpass"; hpv.frequency.value = 90;
+      const pres = ctx.createBiquadFilter(); pres.type = "peaking"; pres.frequency.value = 3200; pres.Q.value = 0.9; pres.gain.value = 2.5;
+      const vg = ctx.createGain(); vg.gain.value = cues.vo.gain || 1;
+      src.connect(hpv).connect(pres).connect(vg).connect(master);
+      src.start(at(0));
+      for (const [a, b] of cues.vo.spans) { // duck the music ~6 dB while she speaks
+        musicIn.gain.setTargetAtTime(0.5, at(Math.max(0, a - 0.08)), 0.03);
+        musicIn.gain.setTargetAtTime(1, at(b + 0.04), 0.12);
+      }
     }
 
     // ---------------------------------------------------------- music
