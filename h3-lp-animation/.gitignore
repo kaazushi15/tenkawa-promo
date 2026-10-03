@@ -6,3 +6,6 @@ out/*.log
 out/segs.txt
 out/h3_lp_motion_silent.mp4
 out/score_v*.wav
+post/v1.mp4
+post/v2.mp4
+post/frames/

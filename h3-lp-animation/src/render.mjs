@@ -11,8 +11,11 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
 const out = args[0] && !args[0].startsWith('--') ? args[0] : 'out/h3_lp_motion_silent.mp4';
+// --page making.html --size 2160x2000 renders other compositions with the same pipeline
 const fps = Number(args[1] && !args[1].startsWith('--') ? args[1] : 60);
 const stills = opt('--frames', null);
+const pageName = opt('--page', 'index.html');
+const [VW, VH] = opt('--size', '1080x1920').split('x').map(Number);
 
 // tiny static server (file:// blocks WebGL textures and CSS masks)
 const MIME = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.jpg': 'image/jpeg', '.png': 'image/png', '.woff2': 'font/woff2' };
@@ -27,10 +30,10 @@ const base = `http://127.0.0.1:${server.address().port}`;
 
 const chromeArgs = (process.env.CHROME_ARGS || '--use-gl=angle --use-angle=swiftshader --disable-gpu-compositing').split(' ').filter(Boolean);
 const browser = await chromium.launch({ args: [...chromeArgs, '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--force-color-profile=srgb'] });
-const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
+const page = await browser.newPage({ viewport: { width: VW, height: VH }, deviceScaleFactor: 1 });
 page.on('console', m => console.log('[page]', m.text()));
 page.on('pageerror', e => console.log('[pageerror]', e.message));
-await page.goto(base + '/index.html?render=1');
+await page.goto(base + '/' + pageName + '?render=1');
 await page.waitForFunction(() => window.READY === true, null, { timeout: 120000 });
 const END = await page.evaluate(() => window.END);
 const stage = await page.$('#stage');
@@ -39,7 +42,7 @@ if (stills) {
   fs.mkdirSync(path.join(root, 'out/stills'), { recursive: true });
   for (const t of stills.split(',').map(Number)) {
     await page.evaluate(t => window.render(t), t);
-    await stage.screenshot({ path: path.join(root, `out/stills/t${t.toFixed(2)}.jpg`), type: 'jpeg', quality: 88 });
+    await stage.screenshot({ path: path.join(root, `out/stills/${path.basename(pageName, '.html')}_t${t.toFixed(2)}.jpg`), type: process.env.STILL_PNG ? 'png' : 'jpeg', ...(process.env.STILL_PNG ? {} : { quality: 88 }) });
     console.log('still', t);
   }
   await browser.close(); server.close(); process.exit(0);

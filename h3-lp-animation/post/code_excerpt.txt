@@ -1,0 +1,19 @@
+FN.s2 = t => {
+  dissolve($('#s2'), t, 7.75, .9, 12.0, 1.1);
+  chars($('#s2k1'), t, 8.15, .09, .8);
+  $('#s2strike').style.transform = `scaleX(${E.io3(P(t, 9.25, .6))})`;
+  const f1 = E.io3(P(t, 9.95, .55)), f2 = E.io3(P(t, 10.35, .7));
+  $('#s2k1').style.transform = `rotateX(${f1 * 90}deg)`; op($('#s2k1'), f1 < 1 ? 1 - f1 * .3 : 0);
+  const k2 = $('#s2k2');
+  const mv = E.io3(P(t, 10.95, 1.0));
+  k2.style.opacity = f2 > 0 ? 1 : 0;
+  k2.style.transform = `translate3d(${lerp(0, -32, mv)}px,${lerp(0, 460, mv)}px,0) scale(${lerp(1, .56, mv)}) rotateX(${(1 - f2) * -90}deg)`;
+  // portrait dissolves in behind the travelling headline
+  const im = $('#s2img'), ik = E.io3(P(t, 10.9, 1.2));
+  im.style.opacity = ik; im.style.filter = `blur(${(1 - ik) * 12}px)`;
+  im.querySelector('img').style.transform = `scale(${lerp(1.1, 1.02, E.o3(P(t, 10.9, 3)))})`;
+  op($('#s2fade'), E.io3(P(t, 10.9, 1.0)));
+  lines($('#s2body'), t, 11.5, .11, .9);
+  // copy fades as the leak arrives
+  rise($('#s2cta'), t, 11.6, .8, 18);
+};

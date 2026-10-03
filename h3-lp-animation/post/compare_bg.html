@@ -1,0 +1,16 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../assets/fonts/fonts.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:2160px;height:2000px;background:#efefed;overflow:hidden}
+#stage{position:relative;width:2160px;height:2000px;font-family:'Zen Kaku Gothic New',sans-serif;color:#141414}
+.lab{position:absolute;top:34px;display:flex;align-items:baseline;gap:22px}
+.lab .k{font-family:'Josefin Sans',sans-serif;font-size:30px;letter-spacing:.22em;font-weight:600}
+.lab .j{font-size:30px;letter-spacing:.06em;font-weight:500;color:#333}
+.lab .k i{display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:12px;vertical-align:2px}
+.pane{position:absolute;top:125px;width:1040px;height:1849px;background:#ddd;box-shadow:0 10px 40px rgba(0,0,0,.08)}
+.arrow{position:absolute;left:1066px;top:1010px;width:28px;text-align:center;font-family:'Josefin Sans';font-size:26px;color:#999}
+</style></head><body><div id="stage">
+<div class="lab" style="left:28px"><span class="k"><i style="background:#bbb"></i>INPUT</span><span class="j">MiniMaxで生成したLPデザイン（画像1枚）</span></div>
+<div class="lab" style="left:1096px"><span class="k"><i style="background:#ffe834"></i>OUTPUT</span><span class="j">Claude Codeで制作したLPモーション</span></div>
+<div class="pane" style="left:26px"></div><div class="pane" style="left:1094px"></div>
+</div><script>document.fonts.ready.then(()=>{window.READY=true;window.END=1;window.render=()=>{}})</script></body></html>
