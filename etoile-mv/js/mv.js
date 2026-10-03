@@ -1,6 +1,16 @@
-/* Étoile — 恋する乙女は、痩せて最高の私へ。 15s DIET JOURNEY spot.
+/* Étoile — 恋する乙女は、痩せて最高の私へ。 15s web spot.
  * Same engine as koi-mv: every visual is a pure function of time, render(t). The player
  * drives t from the AudioContext clock; tools/render.mjs seeks frame by frame.
+ *
+ * Eight bars at 128 BPM, one scene per bar:
+ *   1 HOOK     the headline, built like a route; zoom through 痩せて
+ *   2 START    9.01, the journey and its first stations
+ *   3 BOARD    a departure board flaps through the hurdles
+ *   4 LOW      the colour drains; three confessions stack up
+ *   5 TURN     white flash, close-up: she looks up — わたしをあきらめない。
+ *   6 SUPPORT  次の駅は、理想の私。 — the gym's four promises are the next stations
+ *   7 GOAL     12.25 X'mas lights up
+ *   8 END      brand, features, the free-counselling call to action
  * She faces right and walks right, so the route map flows from right to left. */
 (() => {
   "use strict";
@@ -8,53 +18,39 @@
   // ---------------------------------------------------------------- constants
   const DUR = 15;
   const BEAT = 60 / 128;
+  const B = (n) => +(n * BEAT).toFixed(4);
   const TY = 930;              // main track; her shoes rest on it
-  const UY = 470;              // upper line
-  const FOOT_X = 560;          // where she walks on screen
-  const HEIGHT = 780;          // her height on stage (px)
+  const FOOT_X = 620;          // where she walks on screen
+  const HEIGHT = 780;          // her height on stage at zoom 1
   const SPR = { ax: 420, ay: 1112, top: 14 }; // woman.png: point between the feet, top of the hair
+  const WHITE = "#fffafa", MAGENTA = "#cb2267", BLUSH = "#f7b6cf", NAVY = "#1c2142";
 
-  const TXT = {
-    top: "9月から始まる、12月のクリスマスに向けた、険しいダイエットの旅。",
-    start: ["今日から", "私の未来が", "変わりはじめる。"],
-    koi: "恋する乙女は、", yasete: "痩せて", saikou: "最高の", watashi: "私へ。",
-    turn: ["わたしをあきらめない。", "この一歩が、未来を変える。"],
-    next: ["次の駅は、", "理想の私。"], together: "一緒に、乗り越えよう。",
-    goal: ["最高の笑顔で", "大切な人と特別な日を。"],
+  // Every cue the picture and the soundtrack share (seconds).
+  const T = {
+    hook: [0, B(1), B(2), B(2.5)],    // 恋する乙女は、/ 痩せて / 最高の / 私へ。
+    zoom: B(4),                       // zoom through 痩せて into the map
+    start: 1.97,
+    typeTop: [2.0, 2.86],
+    stations: [B(6), B(7)],           // 誘惑, 停滞期 pass under her feet
+    whip: 3.62,
+    rows: [0, 1, 2, 3, 4, 5].map((k) => B(8 + k / 2)),
+    boardOut: 5.48,
+    low: [B(12), B(16)],
+    cards: [5.66, 6.05, 6.45],
+    turn: B(16),
+    swap: B(18),
+    pull: 8.95,
+    next: B(20),
+    ideal: B(20.5),
+    together: B(22),
+    feats: [B(20.5), B(21.5), B(22.5), B(23.5)],
+    lights: B(24),
+    goal: B(26),
+    sweep: 12.95,
+    end: B(28),
+    cta: 13.62,
   };
-  const BEAT_T = (n) => +(n * BEAT).toFixed(3);
-  // stations on the main track (T) and the upper line (U), lit on the beat at her feet
-  const ST = [
-    { jp: "誘惑", copy: ["スイーツ／チョコ", "夜更かし／お酒", "わかってるけど、", "やめられない。"], t: BEAT_T(6), line: "T" },
-    { jp: "停滞期", copy: ["頑張ってるのに", "体重が減らない。", "心が折れそう。"], t: BEAT_T(7), line: "U" },
-    { jp: "食事制限", copy: ["カロリー計算に疲れた。", "ストレスで", "また食べてしまう。"], t: BEAT_T(8), line: "T" },
-    { jp: "運動が続かない", copy: ["三日坊主で終わってばかり。", "私には無理なのかな。"], t: BEAT_T(9), line: "U" },
-    { jp: "周りの目", copy: ["SNSのキラキラ投稿。", "比べちゃう自分が", "つらい。"], t: BEAT_T(10), line: "T" },
-    { jp: "体重", copy: ["数字に一喜一憂。", "昨日より増えてると、", "落ち込む。"], t: BEAT_T(11), line: "U" },
-    { jp: "むくみ", copy: ["顔も脚もパンパン…", "今日の自分、", "好きになれない。"], t: BEAT_T(12.5), line: "T" },
-    { jp: "自己嫌悪", copy: ["また食べちゃった。", "なんで私って", "こうなんだろう。"], t: BEAT_T(13.5), line: "U" },
-    { jp: "リバウンド不安", copy: ["痩せても維持できるか、", "いつも不安で", "いっぱい。"], t: BEAT_T(14.5), line: "T" },
-  ];
-
-  // Moments the picture and the soundtrack agree on (seconds).
-  const CUES = {
-    start: BEAT_T(1),
-    catch: 7.5,                     // the turn: snare build + crash land here
-    low: [5.625, 7.5],
-    turn: 7.5,
-    goal: BEAT_T(26),
-    sweep: [12.95, 13.4],
-    endDone: 13.62,
-    music: {
-      lift: [7.5, 11.25], hold: [5.625, 7.5],
-      prog: ["G", "G", "G", "A", "Bm", "Fm", "Em", "Asus", "G", "A", "Bm", "G", "G", "A", "D", "D"],
-    },
-  };
-  CUES.etoile = {
-    enter: 0, low: CUES.low, turn: CUES.turn, goal: CUES.goal, end: CUES.sweep[0],
-    title: [BEAT_T(4), BEAT_T(5), BEAT_T(18), BEAT_T(19)],
-    stations: [CUES.start, ...ST.map((s) => s.t)],
-  };
+  const CUES = { etoile: T };
 
   // ---------------------------------------------------------------- helpers
   const $ = (id) => document.getElementById(id);
@@ -80,13 +76,16 @@
     lin: (p) => p,
     out: (p) => 1 - (1 - p) ** 3,
     outQ: (p) => 1 - (1 - p) ** 5,
+    expo: (p) => (p >= 1 ? 1 : 1 - 2 ** (-10 * p)),
     in: (p) => p ** 3,
+    inX: (p) => (p <= 0 ? 0 : 2 ** (10 * p - 10)),
     io: (p) => (p < 0.5 ? 4 * p ** 3 : 1 - (-2 * p + 2) ** 3 / 2),
     sine: (p) => 0.5 - 0.5 * Math.cos(Math.PI * p),
     back: (p) => 1 + 2.9 * (p - 1) ** 3 + 1.9 * (p - 1) ** 2,
   };
   const seg = (t, a, b, e = E.lin) => e(clamp((t - a) / (b - a)));
-  const bump = (t, a, b) => Math.sin(Math.PI * clamp((t - a) / (b - a)));
+  const win = (t, a, b) => t >= a && t < b;
+  const decay = (t, t0, k = 8) => (t >= t0 ? Math.exp(-(t - t0) * k) : 0);
   function keys(list) { // piecewise curve: [[t, value, easeIntoThisKey], ...]
     return (t) => {
       if (t <= list[0][0]) return list[0][1];
@@ -121,223 +120,313 @@
     const last = pts[pts.length - 1];
     return d + ` L${last[0]} ${last[1]}`;
   }
+  const stroke = (w, extra = {}) => ({ fill: "none", stroke: WHITE, "stroke-width": w, "stroke-linecap": "round", "stroke-linejoin": "round", ...extra });
+  function drawable(e) { const L = e.getTotalLength(); e.style.strokeDasharray = `${L} ${L + 10}`; return (p) => { e.style.strokeDashoffset = (L * (1 - p)).toFixed(1); }; }
+  const show = (e, on) => { e.style.visibility = on ? "visible" : "hidden"; };
 
   // ---------------------------------------------------------------- camera
-  // The camera travels right with her; the map therefore flows left.
-  const camV = keys([[0, 0], [0.45, 0], [1.0, 430, E.io], [5.45, 430], [5.9, 330, E.io], [7.35, 330],
-    [7.75, 560, E.io], [11.1, 560], [11.9, 300, E.io], [15, 300]]);
+  // Pan: the map scrolls under her. Lens: zoom about a focus point (cam-space f → screen s).
+  const camV = keys([[0, 240], [1.55, 240], [1.875, 900, E.in], [2.25, 430, E.out], [3.5, 430], [3.66, 2400, E.in], [3.9, 430, E.out],
+    [5.45, 430], [5.8, 250, E.io], [7.4, 250], [7.5, 300], [9.0, 300], [9.45, 760, E.io], [11.1, 760], [11.7, 330, E.io], [15, 330]]);
   const CAM = new Float64Array(15001);
   for (let i = 1; i <= 15000; i++) CAM[i] = CAM[i - 1] + camV((i - 0.5) / 1000) / 1000;
   const camX = (t) => {
     const f = clamp(t, 0, DUR) * 1000, i = Math.floor(f);
     return i >= 15000 ? CAM[15000] : lerp(CAM[i], CAM[i + 1], f - i);
   };
+  const FACE = { x: FOOT_X - 10, y: 330 };                  // her head and fist, cam space
+  function lens(t) {
+    let z = 1, f = [FOOT_X, TY], sc = [FOOT_X, TY];
+    if (t < T.zoom) z = lerp(1.14, 1, seg(t, 0, 1.7, E.out));
+    else if (t < T.whip) z = lerp(1.3, 1, seg(t, T.zoom, 2.4, E.outQ));
+    else if (win(t, T.low[0], T.turn)) { z = lerp(1, 1.1, seg(t, T.low[0], 7.45, E.sine)); f = sc = [FOOT_X, 560]; }
+    else if (win(t, T.turn, 9.45)) {
+      const k = seg(t, T.pull, 9.42, E.io);
+      z = lerp(lerp(2.15, 2.3, seg(t, T.turn, T.pull)), 1, k);
+      f = [FACE.x, FACE.y]; sc = [lerp(560, FACE.x, k), lerp(520, FACE.y, k)];
+    } else if (t >= T.lights) { z = lerp(1, 0.9, seg(t, T.lights, 12.1, E.io)); sc = [lerp(FOOT_X, FOOT_X + 70, seg(t, T.lights, 12.1, E.io)), TY + 34 * seg(t, T.lights, 12.1, E.io)]; }
+    // a small zoom punch on the big hits
+    for (const ti of [...T.hook, T.ideal, T.goal]) z *= 1 + 0.022 * decay(t, ti, 9);
+    return { z, f, s: sc };
+  }
+  const lensTf = (L) => `translate(${(L.s[0] - L.f[0] * L.z).toFixed(2)}px,${(L.s[1] - L.f[1] * L.z).toFixed(2)}px) scale(${L.z.toFixed(4)})`;
+  const toScreen = (L, x, y) => [L.s[0] + (x - L.f[0]) * L.z, L.s[1] + (y - L.f[1]) * L.z];
 
-  // ---------------------------------------------------------------- character
+  // ---------------------------------------------------------------- character footage
   // A keyed MiniMax H3 clip (clips/<name>.js, from tools/key_clips.py) replaces the
   // cut-out sprite when present. ?clip=<name> picks another take.
   const CLIP_NAME = new URLSearchParams(location.search).get("clip") || "h3";
   const CLIP = (window.KOI_CLIPS || {})[CLIP_NAME] || null;
   const VS = CLIP ? HEIGHT / CLIP.height : 1;                  // clip px → stage px
   // story time → clip time (h3: brisk 0–1.8s, head down 2–6s, looks up with a fist 6–9s,
-  // bright stride from 9.5s). The struggle stations play the head-down walk a little slow,
-  // the turn at 7.5s lands on her looking up, and the rest runs at about real speed.
+  // bright stride from 9.5s). The hurdles play the head-down walk a little slow, the turn
+  // lands on her looking up, and the rest runs at about real speed.
   const clipTime = keys((CLIP && CLIP.sync) || [[0, 0], [1.875, 1.875], [5.6, 4.6], [7.35, 5.95], [7.5, 6.3],
     [9.4, 9.2], [13.4, 13.4], [15, 15]]);
   const SS = HEIGHT / (SPR.ay - SPR.top);                      // sprite scale
 
-  const womanX = keys([[0, -260], [0.85, FOOT_X, E.out], [15, FOOT_X]]);
-  function pose(t) {
-    const x = womanX(t);
-    if (CLIP) {
-      return { x, y: 0, rot: 0 }; // the footage carries all of her motion
-    }
-    const low = seg(t, 5.5, 5.9) * (1 - seg(t, 7.3, 7.6));
-    const p = t / BEAT;
-    const bob = Math.abs(Math.sin(Math.PI * p)) * lerp(12, 5, low);
-    const hop = 46 * bump(t, 11.62, 11.95);
-    return { x, y: -bob - hop, rot: lerp(0.8 * Math.sin(Math.PI * p), 2.2, low) };
-  }
+  // ---------------------------------------------------------------- DOM
+  const stage = $("stage"), main = $("main"), bg = $("bg"), bgGlow = $("bg-glow"), camA = $("cam-a"), camB = $("cam-b");
+  const far = $("far"), world = $("world"), wsvg = $("world-svg"), behind = $("behind"), bsvg = $("behind-svg");
+  const fx = $("fx"), near = $("near"), typeL = $("type"), tsvg = $("type-svg"), ticker = $("ticker"), bug = $("bug");
+  const flash = $("flash"), endcard = $("endcard"), sweep = $("sweep"), sweepStar = $("sweep-star");
+  const woman = $("woman"), clipWrap = $("clip-wrap"), clipVid = $("clip"), endWrap = $("end-clip-wrap"), clipVid2 = $("clip2");
 
-  // ---------------------------------------------------------------- DOM build
-  const stage = $("stage"), world = $("world"), wsvg = $("world-svg"), far = $("far"), near = $("near");
-  const fxb = $("fx-back"), top = $("top"), shade = $("shade"), wipe = $("wipe"), endcard = $("endcard");
-  const woman = $("woman"), clipWrap = $("clip-wrap"), clipVid = $("clip");
-  const sweep = $("sweep"), sweepStar = $("sweep-star");
-  const WHITE = "#fffafa", MAGENTA = "#cb2267", BLUSH = "#f7b6cf";
-  const stroke = (w, extra = {}) => ({ fill: "none", stroke: WHITE, "stroke-width": w, "stroke-linecap": "round", "stroke-linejoin": "round", ...extra });
-
+  const EW = { h: 900, x: 1300, y: 1046 };                     // her on the end card
+  const VS2 = CLIP ? EW.h / CLIP.height : 1;
   if (CLIP) {
     woman.style.display = "none";
-    clipVid.src = CLIP.src;
     const [x0, y0, x1, y1] = CLIP.crop;
-    clipVid.style.width = px((x1 - x0) * VS); clipVid.style.height = px((y1 - y0) * VS);
-  } else clipWrap.style.display = "none";
-
-  // world positions: a station sits where her feet are on its beat
-  const footWorld = (t) => womanX(t) + camX(t);
-  ST.forEach((st) => { st.wx = footWorld(st.t); st.wy = st.line === "U" ? UY : TY; });
-  const START_X = footWorld(CUES.start);
-  const firstU = ST.find((q) => q.line === "U"), lastU = [...ST].reverse().find((q) => q.line === "U");
-  const lastT = ST[ST.length - 1];
-
-  // far: the headline in outline, drifting slowly
-  const band = h("div", "band", far, "恋する乙女は、痩せて最高の私へ。　恋する乙女は、痩せて最高の私へ。");
-  band.style.fontSize = "250px"; band.style.top = "540px";
-
-  // main track, drawn in from the left at the start; chevrons point the way she walks
-  const track = s("path", { d: `M-400 ${TY} H${camX(DUR) + 2400}`, ...stroke(16) }, wsvg);
-  const TRACK_LEN = camX(DUR) + 2800;
-  track.style.strokeDasharray = TRACK_LEN;
-  for (let x = START_X + 170; x < camX(DUR) + 2200; x += 320) {
-    s("path", { d: `M${x - 6} ${TY - 8} L${x + 4} ${TY} L${x - 6} ${TY + 8}`, ...stroke(4, { stroke: MAGENTA }) }, wsvg);
-  }
-  // upper line: climbs off the track before the first U station, drops back after the last
-  const uA = firstU.wx - 420, uB = lastU.wx + 520;
-  const upper = s("path", { d: route([[uA - 200, TY], [uA, TY], [uA, UY], [uB, UY], [uB, TY], [uB + 200, TY]], 60), ...stroke(12) }, wsvg);
-  const UPPER_LEN = upper.getTotalLength();
-  upper.style.strokeDasharray = UPPER_LEN;
-  // loose ends and dotted spurs, like the key visual
-  const deco = [];
-  const decoPath = (pts, w, extra, t0) => { const e = s("path", { d: route(pts, 40), ...stroke(w, extra) }, wsvg); deco.push({ e, t0 }); return e; };
-  decoPath([[uA - 520, TY], [uA - 520, 760], [uA - 860, 760]], 8, { "stroke-dasharray": "2 16" }, 1.9);
-  decoPath([[uB + 360, TY], [uB + 360, 640], [uB + 860, 640], [uB + 860, 520]], 12, {}, 1.9);
-  decoPath([[uB + 860, 640], [uB + 1400, 640], [uB + 1400, 800], [uB + 1900, 800], [uB + 1900, TY]], 8, { "stroke-dasharray": "2 16" }, 1.9);
-  decoPath([[uB + 2300, TY], [uB + 2300, 700], [uB + 2800, 700], [uB + 2800, 560], [uB + 3500, 560]], 12, {}, 1.9);
-  const pops = []; // extra nodes that pulse on the beat
-  [[uA - 860, 760], [uB + 860, 520], [uB + 1400, 700], [uB + 1900, 800], [uB + 2800, 630], [uB + 3500, 560]].forEach(([x, y]) =>
-    pops.push(s("circle", { cx: x, cy: y, r: 11, fill: WHITE }, wsvg)));
-
-  // START: the first node, under her feet
-  const startNode = s("circle", { cx: START_X, cy: TY, r: 20, fill: WHITE }, wsvg);
-  const startCore = s("circle", { cx: START_X, cy: TY, r: 8, fill: MAGENTA }, wsvg);
-  const startRing = s("circle", { cx: START_X, cy: TY, r: 20, fill: "none", stroke: WHITE, "stroke-width": 5, opacity: 0 }, wsvg);
-
-  // stations: node on its line, name and copy beside it (above the track / below the upper line)
-  ST.forEach((st) => {
-    st.ring = s("circle", { cx: st.wx, cy: st.wy, r: 18, fill: "none", stroke: WHITE, "stroke-width": 5, opacity: 0 }, wsvg);
-    s("circle", { cx: st.wx, cy: st.wy, r: 18, fill: WHITE }, wsvg);
-    st.core = s("circle", { cx: st.wx, cy: st.wy, r: 8, fill: MAGENTA }, wsvg);
-    const el = h("div", "stn", world);
-    st.name = h("b", "", el, st.jp);
-    const p = h("p", "", el);
-    st.copy.forEach((ln, i) => { if (i) h("br", "", p); p.appendChild(document.createTextNode(ln)); });
-    const rule = h("div", "rule", el);
-    const H = 52 + st.copy.length * 33.4;
-    el.style.left = st.wx + 40 + "px";
-    if (st.line === "U") { el.style.top = UY + 22 + "px"; rule.style.top = "-22px"; rule.style.height = H + 22 + "px"; }
-    else { el.style.top = TY - 26 - H + "px"; rule.style.top = "0px"; rule.style.height = H + 26 + "px"; }
-    rule.style.left = "-40px";
-    st.el = el;
-  });
-
-  // GOAL: a framed destination that scrolls into view, with the star from the key visual
-  const GOAL_X = footWorld(CUES.goal) + 640, GOAL_Y = 66, GW = 500, GH = 420;
-  const goalFrame = s("path", { d: route([[GOAL_X - 260, TY], [GOAL_X - 260, GOAL_Y + GH], [GOAL_X - 40, GOAL_Y + GH], [GOAL_X - 40, GOAL_Y], [GOAL_X + GW, GOAL_Y], [GOAL_X + GW, GOAL_Y + GH], [GOAL_X + 160, GOAL_Y + GH]], 50), ...stroke(12) }, wsvg);
-  const GOAL_LEN = goalFrame.getTotalLength();
-  goalFrame.style.strokeDasharray = GOAL_LEN;
-  const goalNode = s("circle", { cx: GOAL_X - 40, cy: GOAL_Y + 70, r: 18, fill: WHITE }, wsvg);
-  const goalRing = s("circle", { cx: GOAL_X - 40, cy: GOAL_Y + 70, r: 18, fill: "none", stroke: WHITE, "stroke-width": 6, opacity: 0 }, wsvg);
-  const goalStar = s("use", { href: "#star", x: -50, y: -50, width: 100, height: 100, fill: WHITE }, wsvg);
-  const goalRays = Array.from({ length: 12 }, (_, i) => ({ a: (i / 12) * Math.PI * 2, e: s("path", { ...stroke(5), opacity: 0 }, wsvg) }));
-
-  // screen-space kinetic type (shared engine with koi-mv)
-  const kt = window.KoiTypo({ h, E, clamp, lerp, rng, BEAT, musicIn: BEAT_T(4), layer: $("lyrics") });
-  const lyric = (o) => kt.lyric({ lh: o.size * 1.25, ...o });
-  const RX = 940; // the right half of the frame is hers to look into; the words live there
-  lyric({ lines: [TXT.top], x: 70, y: 40, size: 32, lh: 40, weight: 700, style: "type", t0: 0.12, stagger: 0.028, dur: 0.05, out: [1.7], outStyle: "up", outStagger: 0.004, spacing: 0.02 });
-  lyric({ lines: ["START"], x: RX + 10, y: 150, size: 84, font: "Montserrat", weight: 800, style: "slam", t0: CUES.start, stagger: 0.04, out: [1.72], outStyle: "scatter", spacing: 0.04 });
-  lyric({ lines: ["9.01"], x: RX + 330, y: 120, size: 150, font: "Montserrat", weight: 800, style: "pop", t0: CUES.start + 0.16, stagger: 0.05, out: [1.74], outStyle: "scatter", spacing: 0.02 });
-  lyric({ lines: TXT.start, x: RX + 14, y: 316, size: 52, lh: 72, style: "rise", t0: 0.8, stagger: 0.03, out: [1.76], outStyle: "up", outStagger: 0.006, spacing: 0.04 });
-  lyric({ lines: [TXT.koi], x: RX, y: 70, size: 86, style: "pop", t0: CUES.etoile.title[0], stagger: 0.035, out: [3.66], outStyle: "up", spacing: 0.02 });
-  lyric({ lines: [TXT.yasete], x: RX - 30, y: 150, size: 300, style: "slam", t0: CUES.etoile.title[1], stagger: 0.07, dur: 0.26, beat: 0.035, out: [3.64], outStyle: "scatter", outStagger: 0.03, spacing: -0.04 });
-  // each station's name slams in big as she passes it
-  ST.forEach((st, i) => {
-    if (i < 2) return; // 誘惑 and 停滞期 share the frame with 痩せて
-    const low = st.t > CUES.low[0];
-    const next = ST[i + 1] ? ST[i + 1].t : CUES.turn - 0.14;
-    if (low) { // the low stretch: names fall in as vertical columns and stay
-      const col = i - 6;
-      lyric({ lines: [st.jp], x: 1780 - col * 120, y: 50, size: 74, vertical: true, style: "drop", t0: st.t, stagger: 0.05, dur: 0.4, out: [7.28 + col * 0.05], outStyle: "fall", spacing: 0.06, seed: 40 + i });
-    } else {
-      lyric({ lines: [st.jp], x: RX, y: 110, size: st.jp.length > 4 ? 136 : 196, style: i % 2 ? "flip" : "slam", t0: st.t, stagger: 0.04, dur: 0.22, out: [next - 0.08], outStyle: i % 2 ? "up" : "shrink", outDur: 0.1, outStagger: 0.004, spacing: -0.02, seed: 40 + i });
+    for (const [v, k] of [[clipVid, VS], [clipVid2, VS2]]) {
+      v.src = CLIP.src;
+      v.style.width = px((x1 - x0) * k); v.style.height = px((y1 - y0) * k);
     }
+  } else { clipWrap.style.display = "none"; endWrap.innerHTML = '<img src="assets/woman.png" alt="" style="width:840px;height:1125px">'; }
+
+  const footWorld = (t) => FOOT_X + camX(t);
+
+  // ---------------------------------------------------------------- world: the map
+  const TRACK_END = camX(DUR) + 2600;
+  const track = s("path", { d: `M-600 ${TY} H${TRACK_END}`, ...stroke(16) }, wsvg);
+  const trackDraw = drawable(track);
+  for (let x = -300; x < TRACK_END; x += 320) s("path", { d: `M${x - 6} ${TY - 8} L${x + 4} ${TY} L${x - 6} ${TY + 8}`, ...stroke(4, { stroke: MAGENTA }) }, wsvg);
+  // loose spurs and dotted branches, like the key visual (kept low, under the type)
+  const deco = [];
+  const spur = (pts, w, extra = {}, r = 40) => deco.push(s("path", { d: route(pts, r), ...stroke(w, extra) }, wsvg));
+  const DOT = { "stroke-dasharray": "2 16" };
+  {
+    const a = footWorld(2.6), b = footWorld(9.2), c = footWorld(11.4);
+    spur([[a + 900, TY], [a + 900, 800], [a + 1300, 800], [a + 1300, 690]], 10);
+    spur([[a + 1300, 800], [a + 1800, 800]], 6, DOT);
+    spur([[b + 1250, TY], [b + 1250, 640], [b + 1700, 640], [b + 1700, 560], [b + 2300, 560]], 10);
+    spur([[b + 1700, 640], [b + 2200, 640], [b + 2200, TY]], 6, DOT);
+    spur([[c + 300, TY], [c + 300, 700], [c + 640, 700]], 6, DOT);
+  }
+  // node helper: a station dot with a ripple
+  function node(x, y, r = 18) {
+    const ring = s("circle", { cx: x, cy: y, r, fill: "none", stroke: WHITE, "stroke-width": 5, opacity: 0 }, wsvg);
+    const dot = s("circle", { cx: x, cy: y, r, fill: WHITE }, wsvg);
+    const core = s("circle", { cx: x, cy: y, r: r * 0.45, fill: MAGENTA }, wsvg);
+    return { ring, dot, core, r, render(t, t0, big = 1) {
+      const on = t >= t0, dt = t - t0, q = clamp(dt / 0.6);
+      core.setAttribute("fill", on ? WHITE : MAGENTA);
+      dot.setAttribute("r", (r + (on ? 9 * big * Math.exp(-dt * 7) : 0)).toFixed(2));
+      ring.setAttribute("r", (r + q * 70 * big).toFixed(1)); ring.setAttribute("opacity", on && q < 1 ? (1 - q).toFixed(3) : 0);
+    } };
+  }
+  const startNode = node(footWorld(T.start), TY, 22);
+  // the first two hurdles pass under her feet as name tags (the board tells their story)
+  const ST1 = [["誘惑", T.stations[0]], ["停滞期", T.stations[1]]].map(([jp, t]) => {
+    const wx = footWorld(t), n = node(wx, TY);
+    const stub = s("path", { d: `M${wx} ${TY - 18} V${TY - 52}`, ...stroke(5) }, wsvg);
+    const p = h("div", "pill", world, jp);
+    p.style.left = wx - 4 + "px"; p.style.top = TY - 116 + "px";
+    return { jp, t, wx, n, stub, p };
   });
-  lyric({ lines: [TXT.turn[0]], x: RX, y: 96, size: 70, style: "wave", t0: CUES.turn + 0.02, stagger: 0.03, out: [8.36], outStyle: "up", outStagger: 0.005, spacing: 0.02 });
-  lyric({ lines: [TXT.turn[1]], x: RX, y: 196, size: 62, style: "rise", t0: 7.97, stagger: 0.028, out: [8.38], outStyle: "up", outStagger: 0.005, spacing: 0.02 });
-  lyric({ lines: [TXT.saikou], x: RX - 10, y: 60, size: 190, style: "slam", t0: CUES.etoile.title[2], stagger: 0.06, beat: 0.03, out: [9.3], outStyle: "scatter", spacing: -0.03 });
-  lyric({ lines: [TXT.watashi], x: RX + 130, y: 262, size: 190, style: "slam", t0: CUES.etoile.title[3], stagger: 0.06, beat: 0.03, out: [9.32], outStyle: "scatter", spacing: -0.03 });
-  lyric({ lines: [TXT.next[0]], x: RX, y: 70, size: 100, style: "flip", t0: BEAT_T(20), stagger: 0.04, out: [11.02], outStyle: "up", spacing: 0.02 });
-  lyric({ lines: [TXT.next[1]], x: RX, y: 190, size: 136, style: "pop", t0: BEAT_T(20.5), stagger: 0.05, beat: 0.03, out: [11.04], outStyle: "up", spacing: 0.02 });
-  lyric({ lines: [TXT.together], x: RX + 6, y: 360, size: 50, style: "type", t0: BEAT_T(21.5), stagger: 0.045, dur: 0.05, out: [11.06], outStyle: "up", outStagger: 0.004, spacing: 0.06 });
-  lyric({ lines: ["DIET JOURNEY"], x: 1850, y: 60, size: 64, font: "Montserrat", weight: 800, vertical: true, style: "rise", t0: BEAT_T(22), stagger: 0.03, out: [11.08], outStyle: "up", spacing: 0.04 });
-  lyric({ lines: ["for the best me."], x: 1770, y: 70, size: 34, font: "DM Mono", weight: 400, vertical: true, style: "type", t0: BEAT_T(22.5), stagger: 0.035, dur: 0.05, out: [11.1], outStyle: "fade", spacing: 0.12 });
-  // GOAL copy rides in the frame (world space)
-  const goalText = [
-    lyric({ layer: world, lines: ["GOAL"], x: GOAL_X + 20, y: GOAL_Y + 44, size: 54, font: "Montserrat", weight: 800, style: "pop", t0: 11.62, stagger: 0.04, spacing: 0.04 }),
-    lyric({ layer: world, lines: ["12.25"], x: GOAL_X + 18, y: GOAL_Y + 108, size: 106, font: "Montserrat", weight: 800, style: "slam", t0: CUES.goal, stagger: 0.05, spacing: 0 }),
-    lyric({ layer: world, lines: ["X'mas"], x: GOAL_X + 22, y: GOAL_Y + 222, size: 70, font: "Montserrat", weight: 800, style: "pop", t0: CUES.goal + 0.2, stagger: 0.04, spacing: 0.02 }),
-    lyric({ layer: world, lines: TXT.goal, x: GOAL_X + 22, y: GOAL_Y + 316, size: 34, lh: 48, weight: 700, style: "rise", t0: 12.3, stagger: 0.018, spacing: 0.04 }),
+  // the low point: three dim stations
+  const LOWN = [B(12.5), B(13.5), B(14.5)].map((t) => ({ t, n: node(footWorld(t), TY, 14) }));
+  // the gym's four promises, as the stations after the turn
+  const FEATS = [
+    ["i-woman", "完全女性専用", ["安心の", "プライベート空間"]],
+    ["i-coach", "パーソナル指導", ["あなたに合わせた", "オーダーメイド"]],
+    ["i-food", "食事サポート", ["無理なく続ける", "食習慣づくり"]],
+    ["i-bag", "手ぶらOK", ["レンタル・アメニティ", "完備"]],
+  ].map(([icon, title, sub], i) => {
+    const t = T.feats[i], wx = footWorld(t), n = node(wx, TY, 20);
+    const stub = s("path", { d: `M${wx} ${TY - 20} V${TY - 40}`, ...stroke(5) }, wsvg);
+    const el = h("div", "feat-st", world);
+    const sv = s("svg", { viewBox: "0 0 48 64" }, el);
+    const use = s("use", { href: "#" + icon }, sv);
+    const tx = h("div", "", el);
+    h("b", "", tx, title);
+    const it = h("i", "", tx); it.innerHTML = sub.join("<br>");
+    el.style.left = wx - 6 + "px"; el.style.top = TY - 40 - 136 + "px";
+    return { t, wx, n, stub, el, use };
+  });
+  // GOAL: a framed destination, rising off the track, with the star of the key visual
+  const GOAL_X = footWorld(T.goal) + 600, GOAL_Y = 74, GW = 520, GH = 430;
+  const goalGlow = s("circle", { cx: GOAL_X + GW / 2, cy: GOAL_Y + GH / 2, r: 520, fill: "url(#glow-g)", opacity: 0 }, wsvg);
+  const goalFrame = s("path", { d: route([[GOAL_X - 300, TY], [GOAL_X - 300, GOAL_Y + GH], [GOAL_X - 40, GOAL_Y + GH], [GOAL_X - 40, GOAL_Y], [GOAL_X + GW, GOAL_Y], [GOAL_X + GW, GOAL_Y + GH], [GOAL_X + 180, GOAL_Y + GH]], 54), ...stroke(12) }, wsvg);
+  const goalDraw = drawable(goalFrame);
+  const goalNode = node(GOAL_X - 40, GOAL_Y + 78, 20);
+  const SX = GOAL_X + GW + 120, SY = GOAL_Y + 120;
+  const goalStar = s("use", { href: "#star", x: -50, y: -50, width: 100, height: 100, fill: WHITE }, wsvg);
+  const goalRays = Array.from({ length: 16 }, (_, i) => ({ a: (i / 16) * Math.PI * 2, e: s("path", { ...stroke(i % 2 ? 3 : 6), opacity: 0 }, wsvg) }));
+
+  // far: the headline in outline, drifting slowly behind everything
+  const band = h("div", "band", far, "恋する乙女は、痩せて最高の私へ。　恋する乙女は、痩せて最高の私へ。");
+  band.style.fontSize = "240px"; band.style.top = "520px";
+
+  // ---------------------------------------------------------------- behind her (screen space)
+  // rays for the turn, centred on her face
+  const rays = s("g", { opacity: 0 }, bsvg);
+  for (let i = 0; i < 18; i++) {
+    const a0 = (i / 18) * Math.PI * 2, a1 = a0 + Math.PI / 36;
+    s("path", { d: `M0 0 L${Math.cos(a0) * 2400} ${Math.sin(a0) * 2400} L${Math.cos(a1) * 2400} ${Math.sin(a1) * 2400}Z`, fill: WHITE, opacity: 0.14 }, rays);
+  }
+  // MY FUTURE IS MINE. — the words on her bag, running behind the turn
+  const mine = h("div", "band en", behind, "MY FUTURE IS MINE.  MY FUTURE IS MINE.  MY FUTURE IS MINE.");
+  mine.style.fontSize = "190px"; mine.style.top = "800px";
+  // the departure board
+  const board = h("div", "", behind); board.id = "board";
+  const bh = h("div", "head", board); h("b", "", bh, "DIET JOURNEY"); h("i", "", bh, "for the best me.");
+  const ROWS = [
+    ["誘惑", ["スイーツ／チョコ　夜更かし／お酒", "わかってるけど、やめられない。"]],
+    ["停滞期", ["頑張ってるのに体重が減らない。", "心が折れそう。"]],
+    ["食事制限", ["カロリー計算に疲れた。", "ストレスでまた食べてしまう。"]],
+    ["運動が続かない", ["三日坊主で終わってばかり。", "私には無理なのかな。"]],
+    ["周りの目", ["SNSのキラキラ投稿。", "比べちゃう自分がつらい。"]],
+    ["体重", ["数字に一喜一憂。", "昨日より増えてると、落ち込む。"]],
   ];
-
-  // ticker: the words printed on her bag and the side of the key visual
-  const ticker = h("div", "ticker", top, "MY FUTURE IS MINE.  ・  ETOILE GYM  ・  DIET JOURNEY  ・  ".repeat(8));
-
-  // X'mas lights strung across the top once the goal is in sight
-  const lr = rng(5);
-  const LIGHTS = Array.from({ length: 34 }, (_, i) => {
-    const x = 20 + i * 57, sag = 34 * Math.sin((Math.PI * ((x % 640) / 640)));
-    return { x, y: 34 + sag, ph: lr() * 6.28, c: [WHITE, BLUSH, "#ffe3a3"][i % 3], e: s("circle", { cx: x, cy: 34 + sag, r: 7, fill: WHITE, opacity: 0 }, fxb) };
+  const POOL = [...new Set(ROWS.map((r) => r[0]).join("") + "むくみ自己嫌悪リバウンド不安")];
+  const br = rng(77);
+  const boardRail = s("svg", { class: "abs", width: 1000, height: 770 }, board);
+  const railLine = s("path", { d: `M34 ${86 + 57} V${86 + 57 + 5 * 114}`, ...stroke(5) }, boardRail);
+  const railDraw = drawable(railLine);
+  const BROWS = ROWS.map(([name, copy], r) => {
+    const row = h("div", "row", board); row.style.top = 86 + r * 114 + "px";
+    const flap = h("div", "flap", row);
+    const t0 = T.rows[r];
+    const cells = [...name].map((ch, i) => {
+      const c = h("div", "cell", flap), sp = h("span", "", c);
+      const n = 4 + Math.floor(br() * 4), seq = Array.from({ length: n }, () => POOL[Math.floor(br() * POOL.length)]);
+      return { sp, ch, seq, land: t0 + i * 0.03, step: 0.045 };
+    });
+    const cp = h("div", "copy", row);
+    const chars = [];
+    copy.forEach((ln, li) => {
+      const line = h("div", "", cp);
+      for (const ch of ln) chars.push({ e: h("span", "", line, ch), d: chars.length });
+      if (li === 0) line.style.color = WHITE; else line.style.color = BLUSH;
+    });
+    const dot = s("circle", { cx: 34, cy: 86 + 57 + r * 114, r: 11, fill: NAVY, stroke: WHITE, "stroke-width": 5 }, boardRail);
+    return { row, cells, chars, t0, dot };
   });
-  const wire = s("path", { d: "M0 34 " + Array.from({ length: 3 }, (_, k) => `Q${k * 640 + 320} ${34 + 68} ${k * 640 + 640} 34`).join(" "), fill: "none", stroke: WHITE, "stroke-width": 2, opacity: 0 }, fxb);
 
-  // sparkles (the four-point star of the key visual), drifting in the near layer
+  // ---------------------------------------------------------------- screen-space type
+  const kt = window.KoiTypo({ h, E, clamp, lerp, rng, BEAT, musicIn: 0, layer: typeL });
+  const lyric = (o) => kt.lyric({ lh: o.size * 1.25, ...o });
+  const TX = 910; // the right half of the frame is hers to look into; the words live there
+
+  // 1 HOOK — the headline is a route: a rail runs down its left edge, one stop per line
+  const hookRail = s("path", { d: route([[860, -40], [860, 690], [892, 690]], 30), ...stroke(10) }, tsvg);
+  const hookRailDraw = drawable(hookRail);
+  const hookArrow = s("path", { d: "M878 676 L896 690 L878 704", ...stroke(8) }, tsvg);
+  const hookNodes = [[126, T.hook[0]], [360, T.hook[1]], [655, T.hook[2]]].map(([y, t0]) => ({ t0, c: s("circle", { cx: 860, cy: y, r: 16, fill: WHITE }, tsvg) }));
+  const hookUnder = s("path", { d: `M${TX} 760 H${TX + 900}`, ...stroke(10) }, tsvg);
+  const hookUnderDraw = drawable(hookUnder);
+  const hookEnd = s("circle", { cx: TX + 900, cy: 760, r: 14, fill: WHITE }, tsvg);
+  lyric({ lines: ["恋する乙女は、"], x: TX, y: 80, size: 96, style: "pop", t0: T.hook[0] + 0.02, stagger: 0.028, spacing: 0.02 , out: [T.zoom], outStyle: "fade", outDur: 0.001, outStagger: 0 });
+  lyric({ lines: ["痩せて"], x: TX - 14, y: 186, size: 340, style: "slam", t0: T.hook[1], stagger: 0.06, dur: 0.22, beat: 0.03, spacing: -0.06 , out: [T.zoom], outStyle: "fade", outDur: 0.001, outStagger: 0 });
+  lyric({ lines: ["最高の"], x: TX, y: 590, size: 150, style: "slam", t0: T.hook[2], stagger: 0.05, dur: 0.2, spacing: -0.02 , out: [T.zoom], outStyle: "fade", outDur: 0.001, outStagger: 0 });
+  lyric({ lines: ["私へ。"], x: TX + 444, y: 590, size: 150, style: "slam", t0: T.hook[3], stagger: 0.05, dur: 0.2, spacing: -0.02 , out: [T.zoom], outStyle: "fade", outDur: 0.001, outStagger: 0 });
+
+  // 2 START — the journey begins; a frame drawn like the START box of the key visual
+  lyric({ lines: ["9月から始まる、12月のクリスマスに向けた、険しいダイエットの旅。"], x: 70, y: 34, size: 30, weight: 700, style: "type", t0: T.typeTop[0], stagger: 0.028, dur: 0.04, out: [T.whip - 0.2], outStyle: "up", outStagger: 0.002, spacing: 0.03 });
+  const startFrame = s("path", { d: route([[1560, 400], [1560, 110], [TX, 110], [TX, 700], [1560, 700], [1560, 560]], 40), ...stroke(10) }, tsvg);
+  const startFrameDraw = drawable(startFrame);
+  lyric({ lines: ["START"], x: TX + 50, y: 150, size: 76, font: "Montserrat", weight: 800, style: "slam", t0: T.start, stagger: 0.035, out: [T.whip - 0.22], outStyle: "scatter", outDur: 0.2, spacing: 0.06 });
+  lyric({ lines: ["9.01"], x: TX + 40, y: 232, size: 220, font: "Montserrat", weight: 800, style: "pop", t0: T.start + 0.12, stagger: 0.05, beat: 0.03, out: [T.whip - 0.2], outStyle: "scatter", outDur: 0.2, spacing: -0.01 });
+  lyric({ lines: ["今日から", "私の未来が", "変わりはじめる。"], x: TX + 54, y: 486, size: 52, lh: 70, style: "rise", t0: 2.3, stagger: 0.03, out: [T.whip - 0.2], outStyle: "up", outDur: 0.18, outStagger: 0.002, spacing: 0.05 });
+  lyric({ lines: ["DIET JOURNEY"], x: 1786, y: 150, size: 70, font: "Montserrat", weight: 800, vertical: true, style: "rise", t0: 2.15, stagger: 0.025, out: [T.whip - 0.2], outStyle: "up", outDur: 0.18, spacing: 0.05 });
+  lyric({ lines: ["for the best me."], x: 1690, y: 160, size: 34, font: "DM Mono", weight: 400, vertical: true, style: "type", t0: 2.45, stagger: 0.03, dur: 0.04, out: [T.whip - 0.2], outStyle: "fade", outDur: 0.15, spacing: 0.12 });
+
+  // 4 LOW — three confessions stack up, each tagged with its station
+  const CARDS = [["むくみ", ["顔も脚もパンパン…", "今日の自分、好きになれない。"]], ["自己嫌悪", ["また食べちゃった。", "なんで私ってこうなんだろう。"]], ["リバウンド不安", ["痩せても維持できるか、", "いつも不安でいっぱい。"]]]
+    .map(([tag, lines], i) => {
+      const y = 132 + i * 276, t0 = T.cards[i];
+      const chip = h("div", "chip", typeL, tag); chip.style.left = TX + 50 + "px"; chip.style.top = y + "px";
+      lyric({ lines, x: TX + 50, y: y + 64, size: 52, lh: 70, style: "rise", t0: t0 + 0.08, stagger: 0.022, dur: 0.34, out: [7.34 + i * 0.03], outStyle: "fall", outStagger: 0.004, spacing: 0.03, seed: 60 + i });
+      return { chip, t0 };
+    });
+  const lowRain = ["むくみ", "自己嫌悪", "リバウンド不安"].map((w, i) => {
+    const e = h("div", "band", behind, w);
+    e.style.writingMode = "vertical-rl"; e.style.fontSize = "200px"; e.style.left = 1690 - i * 250 + "px"; e.style.top = "0px";
+    e.style.webkitTextStroke = "2px rgba(255,250,250,0.18)";
+    return e;
+  });
+
+  // 5 TURN — close-up; the line lands on the beat, then the promise
+  lyric({ lines: ["わたしを"], x: 960, y: 170, size: 132, style: "slam", t0: T.turn, stagger: 0.05, dur: 0.2, out: [T.swap - 0.07], outStyle: "scatter", outStagger: 0.012, spacing: 0.02 });
+  lyric({ lines: ["あきらめない。"], x: 960, y: 330, size: 132, style: "slam", t0: T.turn + BEAT / 2, stagger: 0.045, dur: 0.2, beat: 0.025, out: [T.swap - 0.06], outStyle: "scatter", outStagger: 0.012, spacing: 0.0 });
+  lyric({ lines: ["この一歩が、"], x: 966, y: 200, size: 112, style: "flip", t0: T.swap, stagger: 0.04, out: [9.2], outStyle: "up", outStagger: 0.01, spacing: 0.02 });
+  lyric({ lines: ["未来を変える。"], x: 966, y: 352, size: 112, style: "slam", t0: T.swap + BEAT / 2, stagger: 0.045, dur: 0.2, beat: 0.025, out: [9.22], outStyle: "up", outStagger: 0.01, spacing: 0.0 });
+  const turnUnder = s("path", { d: "M966 500 H1880", ...stroke(12) }, tsvg);
+  const turnUnderDraw = drawable(turnUnder);
+
+  // 6 SUPPORT — next station: the ideal me (inverted telop), then "together"
+  lyric({ lines: ["次の駅は、"], x: TX + 40, y: 80, size: 92, style: "pop", t0: T.next, stagger: 0.035, out: [11.36], outStyle: "up", spacing: 0.02 });
+  const telop = h("div", "telop", typeL); telop.style.left = TX + 22 + "px"; telop.style.top = "196px"; telop.style.width = "906px"; telop.style.height = "202px";
+  lyric({ lines: ["理想の私。"], x: TX + 50, y: 212, size: 170, color: MAGENTA, style: "slam", t0: T.ideal + 0.04, stagger: 0.05, dur: 0.2, beat: 0.025, out: [11.38], outStyle: "up", spacing: 0.0 });
+  lyric({ lines: ["一緒に、乗り越えよう。"], x: TX + 44, y: 440, size: 60, style: "rise", t0: T.together, stagger: 0.03, out: [11.4], outStyle: "up", outStagger: 0.005, spacing: 0.06 });
+
+  // 7 GOAL — the copy rides in the frame (world space)
+  lyric({ layer: world, lines: ["GOAL"], x: GOAL_X + 26, y: GOAL_Y + 46, size: 58, font: "Montserrat", weight: 800, style: "pop", t0: 11.62, stagger: 0.04, spacing: 0.06 });
+  lyric({ layer: world, lines: ["12.25"], x: GOAL_X + 20, y: GOAL_Y + 112, size: 118, font: "Montserrat", weight: 800, style: "slam", t0: T.goal, stagger: 0.05, beat: 0.03, spacing: 0 });
+  lyric({ layer: world, lines: ["X'mas"], x: GOAL_X + 26, y: GOAL_Y + 238, size: 74, font: "Montserrat", weight: 800, style: "pop", t0: T.goal + 0.16, stagger: 0.04, spacing: 0.02 });
+  lyric({ layer: world, lines: ["最高の笑顔で", "大切な人と特別な日を。"], x: GOAL_X + 26, y: GOAL_Y + 336, size: 36, lh: 50, weight: 700, style: "rise", t0: 12.3, stagger: 0.016, spacing: 0.05 });
+
+  // ---------------------------------------------------------------- fx: lights, speed lines, sparkles, snow
+  const lr = rng(5);
+  const wire = s("path", { d: "M-20 30 " + Array.from({ length: 4 }, (_, k) => `Q${k * 520 + 260} ${30 + 74} ${k * 520 + 520} 30`).join(" "), fill: "none", stroke: WHITE, "stroke-width": 2, opacity: 0 }, fx);
+  const LIGHTS = Array.from({ length: 40 }, (_, i) => {
+    const x = 6 + i * 50, u = (x % 520) / 520, y = 30 + 74 * 2 * u * (1 - u) * 1.0;
+    const halo = s("circle", { cx: x, cy: y + 8, r: 18, fill: "url(#glow-g)", opacity: 0 }, fx);
+    return { x, ph: lr() * 6.28, c: [WHITE, BLUSH, "#ffe3a3"][i % 3], halo, e: s("circle", { cx: x, cy: y + 8, r: 7, fill: WHITE, opacity: 0 }, fx) };
+  });
+  const SPEED = Array.from({ length: 18 }, () => ({ y: 520 + lr() * 380, x0: lr() * 2600, len: 140 + lr() * 300, v: 2600 + lr() * 1600, e: s("path", { ...stroke(4), opacity: 0 }, fx) }));
   const sr = rng(31);
-  const SPARK = Array.from({ length: 30 }, () => {
+  const SPARK = Array.from({ length: 34 }, () => {
     const e = s("svg", { class: "abs", width: 40, height: 40, viewBox: "-50 -50 100 100" }, near);
     s("use", { href: "#star", x: -50, y: -50, width: 100, height: 100, fill: WHITE }, e);
     return { e, wx: sr() * 9000, y: 60 + sr() * 880, sc: 0.3 + sr() * 0.8, ph: sr() * 6.28, par: 1.1 + sr() * 0.5 };
   });
-  // speed lines while she strides toward the next station
-  const SPEED = Array.from({ length: 16 }, () => ({ y: 520 + sr() * 360, x0: sr() * 2600, len: 120 + sr() * 260, v: 2200 + sr() * 1400, e: s("path", { ...stroke(4), opacity: 0 }, fxb) }));
-
-  // stripes that wipe the low stretch away (the turn)
-  const BARS = [BLUSH, WHITE, BLUSH, WHITE, MAGENTA].map((c, i) => {
-    const e = h("div", "bar", wipe);
-    e.style.background = c; e.style.width = "1100px";
-    return { e, i };
-  });
+  const SNOW = Array.from({ length: 70 }, () => ({ x: sr() * 2000, y: sr() * 1100, r: 2 + sr() * 4, v: 40 + sr() * 70, sw: 10 + sr() * 26, ph: sr() * 6.28,
+    e: s("circle", { r: 3, fill: WHITE, opacity: 0 }, fx) }));
+  ticker.textContent = "MY FUTURE IS MINE.  ・  ETOILE GYM  ・  DIET JOURNEY  ・  ".repeat(8);
 
   // ---------------------------------------------------------------- end card
   const EC = {};
-  const ec = (id, tag, text) => { const e = h(tag, "e", endcard, text); e.id = id; return (EC[id] = e); };
-  ec("e-top", "div", TXT.top);
-  ec("e-head", "div", "恋する乙女は、痩せて最高の私へ。");
-  ec("e-kind", "div", "女性専用パーソナルジム");
-  ec("e-logo", "div", "Étoile");
-  ec("e-kana", "div", "エトワール");
-  ec("e-tag", "div", "わたし史上、いちばん輝くために。");
-  const FEATS = [["i-woman", "完全女性専用", "安心の", "プライベート空間"], ["i-coach", "パーソナル指導", "あなたに合わせた", "オーダーメイド"],
-    ["i-food", "食事サポート", "無理なく続ける", "食習慣づくり"], ["i-bag", "手ぶらOK", "レンタル・アメニティ", "完備"]].map((f, i) => {
+  const ec = (id, text) => { const e = h("div", "e", endcard, text); e.id = id; return (EC[id] = e); };
+  ec("e-head", "恋する乙女は、痩せて最高の私へ。");
+  ec("e-kind", "女性専用パーソナルジム");
+  ec("e-logo", "Étoile");
+  ec("e-kana", "エトワール");
+  ec("e-tag", "わたし史上、いちばん輝くために。");
+  const EFEATS = [["i-woman", "完全女性専用", "安心のプライベート空間"], ["i-coach", "パーソナル指導", "あなたに合わせたオーダーメイド"],
+    ["i-food", "食事サポート", "無理なく続ける食習慣づくり"], ["i-bag", "手ぶらOK", "レンタル・アメニティ完備"]].map((f, i) => {
     const el = h("div", "feat", endcard);
-    el.style.left = 110 + (i % 2) * 390 + "px"; el.style.top = 712 + Math.floor(i / 2) * 136 + "px";
+    el.style.left = 110 + (i % 2) * 400 + "px"; el.style.top = 562 + Math.floor(i / 2) * 120 + "px";
     const sv = s("svg", { viewBox: "0 0 48 64" }, el);
     s("use", { href: "#" + f[0], color: WHITE }, sv);
-    const tx = h("div", "", el);
-    h("b", "", tx, f[1]); tx.appendChild(document.createTextNode(f[2])); h("br", "", tx); tx.appendChild(document.createTextNode(f[3]));
+    const tx = h("div", "", el); h("b", "", tx, f[1]); tx.appendChild(document.createTextNode(f[2]));
     return el;
   });
-  const eWoman = h("div", "", endcard); eWoman.id = "e-woman";
-  h("img", "", eWoman).src = "assets/woman.png";
-  const EW = { s: 0.84, x: 1240, y: 1068 };
-  const box = h("div", "", endcard); box.id = "e-box";
-  const n1 = h("div", "n1", box); n1.innerHTML = "次の駅は、<br>理想の私。";
-  h("div", "n2", box, TXT.together);
-  h("div", "acc", box).innerHTML = ["心斎橋駅 徒歩5分", "梅田駅 徒歩7分", "女性トレーナーのみ在籍", "無料カウンセリング受付中"].join("<br>");
-  const endStar = s("svg", { class: "abs", width: 90, height: 90, viewBox: "-50 -50 100 100" }, endcard);
-  s("use", { href: "#star", x: -50, y: -50, width: 100, height: 100, fill: WHITE }, endStar);
-  const endItems = [["e-top", 13.3], ["e-head", 13.14], ["e-kind", 13.22], ["e-logo", 13.26], ["e-kana", 13.34], ["e-tag", 13.36]]
-    .map(([id, t0]) => ({ e: EC[id], t0 })).concat(FEATS.map((e, i) => ({ e, t0: 13.38 + i * 0.04 })), [{ e: box, t0: 13.3 }]);
+  const ctaRing = h("div", "", endcard); ctaRing.id = "cta-ring";
+  const cta = h("div", "", endcard); cta.id = "cta";
+  h("b", "", cta, "無料カウンセリング受付中");
+  const ctaSv = s("svg", { viewBox: "0 0 60 60" }, cta);
+  s("circle", { cx: 30, cy: 30, r: 30, fill: MAGENTA }, ctaSv);
+  const ctaArrow = s("path", { d: "M24 18 L36 30 L24 42", fill: "none", stroke: WHITE, "stroke-width": 6, "stroke-linecap": "round", "stroke-linejoin": "round" }, ctaSv);
+  const acc = h("div", "", endcard); acc.id = "e-access";
+  const accSv = s("svg", { class: "abs", width: 900, height: 60 }, acc);
+  const accLine = s("path", { d: "M10 24 H880", ...stroke(4) }, accSv);
+  const accDraw = drawable(accLine);
+  const ACC = [["心斎橋駅 徒歩5分", 10], ["梅田駅 徒歩7分", 300], ["女性トレーナーのみ在籍", 560]].map(([txt, x], i) => {
+    const c = s("circle", { cx: x, cy: 24, r: 9, fill: WHITE }, accSv);
+    const sp = h("span", "", acc, txt); sp.style.left = x + 22 + "px"; sp.style.top = "36px";
+    return { c, sp, i };
+  });
+  const badge = h("div", "", endcard); badge.id = "e-badge";
+  h("b", "", badge, "GOAL"); h("i", "", badge, "12.25"); h("em", "", badge, "X'mas");
+  ec("e-dj", "DIET JOURNEY"); ec("e-fb", "for the best me.");
+  const endStars = [[1520, 150, 1.2], [1880, 420, 0.7], [1010, 120, 0.8]].map(([x, y, k]) => {
+    const e = s("svg", { class: "abs", width: 90, height: 90, viewBox: "-50 -50 100 100" }, endcard);
+    s("use", { href: "#star", x: -50, y: -50, width: 100, height: 100, fill: WHITE }, e);
+    return { e, x, y, k };
+  });
+  const END_IN = [["e-head", 13.16], ["e-kind", 13.24], ["e-tag", 13.42], ["e-dj", 13.36], ["e-fb", 13.42]].map(([id, t0]) => ({ e: EC[id], t0 }))
+    .concat(EFEATS.map((e, i) => ({ e, t0: 13.46 + i * 0.045 })));
 
   // grain: a few fixed noise frames, cycled per frame so exports stay deterministic
   const grain = $("grain"), gctx = grain.getContext("2d");
@@ -348,154 +437,258 @@
   });
 
   // ---------------------------------------------------------------- render
-  let clipWant = null;
-  function render(t) {
-    const cam = camX(t);
-    world.style.transform = tf(-cam, 0);
-    const beat = kt.beatPulse(t), bar = kt.barPulse(t);
+  let clipWant = null, clip2Want = null;
+  const mixHex = (a, b, p) => { // "#rrggbb" blend
+    const A = parseInt(a.slice(1), 16), Bc = parseInt(b.slice(1), 16);
+    const c = (sh) => Math.round(lerp((A >> sh) & 255, (Bc >> sh) & 255, p));
+    return `rgb(${c(16)},${c(8)},${c(0)})`;
+  };
 
-    // --- background: low stretch darkens, the turn brings the colour back
-    const low = seg(t, 5.55, 5.95, E.sine) * (t < CUES.turn ? 1 : 0);
-    shade.style.opacity = (0.42 * low).toFixed(3);
-    stage.style.background = MAGENTA;
-    far.style.opacity = (0.55 * seg(t, 1.9, 2.3) * (1 - 0.6 * low)).toFixed(3);
-    band.style.transform = tf(200 - cam * 0.3, 0);
+  function render(t) {
+    const cam = camX(t), L = lens(t), beat = kt.beatPulse(t);
+
+    // --- zoom through 痩せて (the whole frame dives into the せ), white at the cut
+    const zt = seg(t, 1.6, T.zoom, E.inX);
+    main.style.transform = t < T.zoom && zt > 0 ? `translate(${1390 * (1 - (1 + zt * 11))}px,${300 * (1 - (1 + zt * 11))}px) scale(${1 + zt * 11})` : "none";
+    main.style.filter = t < T.zoom && zt > 0.05 ? `blur(${(zt * 6).toFixed(2)}px)` : "none";
+    const fl = Math.max(seg(t, 1.76, T.zoom) * (t < T.zoom ? 1 : 0), t >= T.zoom ? 1 - seg(t, T.zoom, T.zoom + 0.2, E.out) : 0,
+      t >= T.turn - 0.05 ? bumpFlash(t, T.turn) : 0);
+    flash.style.opacity = fl.toFixed(3);
+
+    // --- background: magenta; the low point drains toward deep wine; light blooms at the turn and the goal
+    const low = seg(t, T.low[0] - 0.1, T.low[0] + 0.35, E.sine) * (t < T.turn ? 1 : 0);
+    bg.style.background = mixHex("#cb2267", "#5e0d31", low * 0.92);
+    const gx = 960 + 420 * Math.sin(t * 0.45), gy = 540 + 200 * Math.cos(t * 0.37);
+    bgGlow.style.transform = tf(gx - 800, gy - 800, ` scale(${(1 + 0.04 * beat).toFixed(3)})`);
+    bgGlow.style.opacity = (lerp(0.8, 0.15, low) + 0.4 * seg(t, T.lights, 12.3)).toFixed(3);
+
+    // --- camera
+    camA.style.transform = camB.style.transform = lensTf(L);
+    world.style.transform = tf(-cam, 0);
+    world.style.opacity = (1 - 0.45 * low).toFixed(3);
+    camA.style.filter = win(t, 3.6, 3.9) ? `blur(${(4 * Math.sin(Math.PI * seg(t, 3.6, 3.9))).toFixed(2)}px)` : "none";
+    far.style.opacity = (0.5 * seg(t, T.zoom, T.zoom + 0.4) * (1 - low) * (t < T.turn || t > 9.4 ? 1 : 0)).toFixed(3);
+    band.style.transform = tf(260 - cam * 0.3, 0);
 
     // --- the map
-    track.style.strokeDashoffset = Math.max(0, TRACK_LEN - (cam + 2400) * seg(t, 0.05, 0.6, E.out)); // draws in from the left
-    upper.style.strokeDashoffset = UPPER_LEN * (1 - seg(t, 1.88, 2.4, E.io));
-    deco.forEach((d) => { d.e.style.opacity = seg(t, d.t0, d.t0 + 0.3).toFixed(3); });
-    pops.forEach((p) => p.setAttribute("r", (11 + 6 * beat).toFixed(2)));
-    const sOn = t >= CUES.start;
-    startCore.setAttribute("fill", sOn ? WHITE : MAGENTA);
-    startNode.setAttribute("r", (20 + (sOn ? 6 * Math.exp(-(t - CUES.start) * 6) : 0) + 2 * beat).toFixed(2));
-    const sr_ = clamp((t - CUES.start) / 0.6);
-    startRing.setAttribute("r", 20 + sr_ * 70); startRing.setAttribute("opacity", sOn && sr_ < 1 ? (1 - sr_).toFixed(3) : 0);
-    ST.forEach((st) => {
-      const on = t >= st.t, dt = t - st.t;
-      // everything on the map arrives with the upper line (1.9s); stations off to the right just scroll in
-      const sx = st.wx - camX(1.9);
-      const appear = sx > 1960 ? 1 : seg(t, 1.9 + (sx / 1920) * 0.35, 2.15 + (sx / 1920) * 0.35, E.back);
-      st.el.style.opacity = clamp(appear * 1.5).toFixed(3);
-      st.el.style.transform = tf(0, (1 - appear) * (st.line === "U" ? -24 : 24));
-      st.core.setAttribute("fill", on ? WHITE : MAGENTA);
-      st.core.setAttribute("r", on ? (8 + 12 * Math.exp(-dt * 7)).toFixed(2) : 8);
-      const rq = clamp(dt / 0.55);
-      st.ring.setAttribute("r", 18 + rq * 64); st.ring.setAttribute("opacity", on && rq < 1 ? (1 - rq).toFixed(3) : 0);
-      const pop = on ? 1 + 0.22 * Math.exp(-dt * 8) * Math.cos(dt * 22) : 1;
-      st.name.style.background = on ? WHITE : "transparent";
-      st.name.style.color = on ? MAGENTA : WHITE;
-      st.name.style.transform = `scale(${pop.toFixed(3)})`;
-      st.el.style.visibility = appear > 0 ? "visible" : "hidden";
+    trackDraw(clamp(seg(t, 0, 0.5, E.out) + (t > 0.5 ? 1 : 0)));
+    deco.forEach((d) => { d.style.opacity = seg(t, T.zoom, T.zoom + 0.4).toFixed(3); });
+    startNode.render(t, T.start, 1.6);
+    ST1.forEach((q) => {
+      q.n.render(t, q.t);
+      const on = t >= q.t, dt = t - q.t, ap = seg(t, T.zoom + 0.1, T.zoom + 0.4, E.back);
+      q.p.style.opacity = ap.toFixed(3);
+      q.p.style.background = on ? WHITE : "transparent"; q.p.style.color = on ? MAGENTA : WHITE;
+      q.p.style.transform = `scale(${(ap * (on ? 1 + 0.2 * Math.exp(-dt * 8) * Math.cos(dt * 22) : 1)).toFixed(3)})`;
+      q.stub.setAttribute("opacity", ap);
     });
-    // GOAL frame draws as it comes into view, lights on its beat
-    goalFrame.style.strokeDashoffset = GOAL_LEN * (1 - seg(t, 11.2, 11.75, E.io));
-    const gOn = t >= CUES.goal, gd = t - CUES.goal;
-    goalNode.setAttribute("r", (18 + (gOn ? 10 * Math.exp(-gd * 6) : 0) + 3 * beat).toFixed(2));
-    goalNode.setAttribute("opacity", seg(t, 11.5, 11.6));
-    const gq = clamp(gd / 0.7);
-    goalRing.setAttribute("r", 18 + gq * 120); goalRing.setAttribute("opacity", gOn && gq < 1 ? (1 - gq).toFixed(3) : 0);
-    const starS = seg(t, CUES.goal, CUES.goal + 0.35, E.back) * (1 + 0.12 * beat);
-    const SX = GOAL_X + GW + 110, SY = GOAL_Y + 110;
-    goalStar.setAttribute("transform", `translate(${SX} ${SY}) rotate(${(gOn ? gd * 40 : 0).toFixed(1)}) scale(${(1.9 * starS).toFixed(3)})`);
+    LOWN.forEach((q) => q.n.render(t, q.t, 0.7));
+    FEATS.forEach((q) => {
+      q.n.render(t, q.t, 1.3);
+      const on = t >= q.t, dt = t - q.t, ap = seg(t, T.turn, T.turn + 0.2);
+      q.el.style.opacity = ap.toFixed(3);
+      q.el.style.background = on ? WHITE : "transparent"; q.el.style.color = on ? MAGENTA : WHITE;
+      q.use.setAttribute("color", on ? MAGENTA : WHITE);
+      q.el.style.transform = `scale(${(on ? 1 + 0.16 * Math.exp(-dt * 7) * Math.cos(dt * 20) : 1).toFixed(3)})`;
+    });
+    goalDraw(seg(t, T.lights, T.lights + 0.6, E.io));
+    goalNode.render(t, T.goal, 2.2);
+    goalNode.dot.setAttribute("opacity", seg(t, 11.5, 11.6));
+    goalGlow.setAttribute("opacity", (seg(t, T.goal - 0.1, T.goal + 0.4) * (0.85 + 0.15 * beat)).toFixed(3));
+    const gOn = t >= T.goal, gd = t - T.goal, starS = seg(t, T.goal, T.goal + 0.35, E.back) * (1 + 0.12 * beat);
+    goalStar.setAttribute("transform", `translate(${SX} ${SY}) rotate(${(gOn ? gd * 40 : 0).toFixed(1)}) scale(${(2.1 * starS).toFixed(3)})`);
     goalRays.forEach((r) => {
-      const q = clamp(gd / 0.6), r0 = 70 + 160 * E.out(q), r1 = r0 + 60 * (1 - q);
+      const q = clamp(gd / 0.7), r0 = 80 + 200 * E.out(q), r1 = r0 + 80 * (1 - q);
       r.e.setAttribute("d", `M${SX + Math.cos(r.a) * r0} ${SY + Math.sin(r.a) * r0} L${SX + Math.cos(r.a) * r1} ${SY + Math.sin(r.a) * r1}`);
       r.e.setAttribute("opacity", gOn && q < 1 ? 1 - q : 0);
     });
 
+    // --- behind her: board, rain, rays, MY FUTURE IS MINE.
+    const bin = seg(t, T.whip - 0.02, T.rows[0] + 0.06, E.outQ), bout = seg(t, T.boardOut, T.boardOut + 0.16, E.in);
+    show(board, t >= T.whip - 0.02 && t < T.boardOut + 0.16);
+    board.style.transform = `translate(${((1 - bin) * 1150).toFixed(1)}px,${(bout * 120).toFixed(1)}px) skewX(${((1 - bin) * -10).toFixed(2)}deg) scaleY(${(1 - bout * 0.6).toFixed(3)})`;
+    board.style.opacity = (1 - bout).toFixed(3);
+    railDraw(seg(t, T.rows[0], T.rows[5] + 0.1));
+    BROWS.forEach((r) => {
+      r.dot.setAttribute("fill", t >= r.t0 ? WHITE : NAVY);
+      r.dot.setAttribute("r", (11 + (t >= r.t0 ? 6 * Math.exp(-(t - r.t0) * 8) : 0)).toFixed(2));
+      r.cells.forEach((c) => {
+        // split-flap: the cell rattles through a few glyphs, then lands on its letter
+        const first = c.land - c.seq.length * c.step;
+        if (t < first) { c.sp.textContent = ""; c.sp.style.transform = "none"; return; }
+        const k = Math.min(c.seq.length, Math.floor((t - first) / c.step));
+        c.sp.textContent = k >= c.seq.length ? c.ch : c.seq[k];
+        const ph = ((t - first) / c.step) % 1;
+        c.sp.style.transform = t < c.land + c.step ? `scaleY(${Math.abs(Math.cos(Math.PI * ph * 0.5)).toFixed(3)})` : "none";
+        c.sp.style.color = t >= c.land ? WHITE : "rgba(255,250,250,0.6)";
+      });
+      r.chars.forEach((c) => {
+        const q = seg(t, r.t0 + 0.06 + c.d * 0.012, r.t0 + 0.06 + c.d * 0.012 + 0.08);
+        c.e.style.opacity = q.toFixed(3);
+        c.e.style.transform = tf((1 - q) * 10, 0);
+      });
+    });
+    lowRain.forEach((e, i) => {
+      e.style.opacity = (low * 0.9).toFixed(3);
+      e.style.transform = tf(0, -260 + (t - T.low[0]) * (60 + i * 25) + i * 90);
+    });
+    const face = toScreen(L, FACE.x - 30, FACE.y - 60);
+    const rv = seg(t, T.turn, T.turn + 0.25) * (1 - seg(t, 9.1, 9.4));
+    rays.setAttribute("opacity", rv.toFixed(3));
+    rays.setAttribute("transform", `translate(${face[0].toFixed(1)} ${face[1].toFixed(1)}) rotate(${((t - T.turn) * 9).toFixed(2)})`);
+    mine.style.opacity = (seg(t, T.turn, T.turn + 0.2) * (1 - seg(t, 9.15, 9.4)) * 0.9).toFixed(3);
+    mine.style.transform = tf(-((t - T.turn) * 260) % 2400 - 40, 0);
+
     // --- her
-    const p = pose(t);
     if (CLIP) {
       const [x0, y0] = CLIP.crop;
-      // hold her head and shoulders steady: the generated camera drifts a little
       const i = clamp(Math.floor(clipTime(t) * CLIP.fps), 0, CLIP.frames - 1);
-      const drift = CLIP.cx ? CLIP.cx[i] - CLIP.cx[0] : 0;
-      const ox = p.x - (CLIP.feet[0] - x0 + drift) * VS, oy = TY + p.y - (CLIP.feet[1] - y0) * VS;
-      clipWrap.style.transform = tf(ox, oy);
+      const drift = CLIP.cx ? CLIP.cx[i] - CLIP.cx[0] : 0; // hold her head and shoulders steady against the generated camera's drift
+      clipWrap.style.transform = tf(FOOT_X - (CLIP.feet[0] - x0 + drift) * VS, TY - (CLIP.feet[1] - y0) * VS);
       clipWant = clipTime(t);
     } else {
+      const p = t / BEAT, bob = Math.abs(Math.sin(Math.PI * p)) * lerp(12, 5, low);
       woman.style.transformOrigin = `${SPR.ax}px ${SPR.ay}px`;
-      woman.style.transform = tf(p.x - SPR.ax, TY + p.y - SPR.ay, ` rotate(${p.rot.toFixed(2)}deg) scale(${SS.toFixed(4)})`);
+      woman.style.transform = tf(FOOT_X - SPR.ax, TY - bob - SPR.ay, ` rotate(${lerp(0.8 * Math.sin(Math.PI * p), 2.2, low).toFixed(2)}deg) scale(${SS.toFixed(4)})`);
     }
+    $("actor").style.filter = `drop-shadow(14px 10px 0 rgba(96,8,42,${(0.3 + 0.2 * low).toFixed(2)})) brightness(${(1 - 0.22 * low).toFixed(3)}) saturate(${(1 - 0.25 * low).toFixed(3)})`;
 
     // --- type
     kt.render(t);
-    ticker.style.opacity = (0.9 * seg(t, 1.9, 2.2) * (1 - seg(t, 11.2, 11.4))).toFixed(3);
-    ticker.style.transform = tf(-((t * 140) % 1400) , 0);
-
-    // --- lights, sparkles, speed lines
-    const lv = seg(t, 11.3, 11.7);
-    wire.setAttribute("opacity", 0.8 * lv);
-    LIGHTS.forEach((l, i) => {
-      const on = seg(t, 11.3 + i * 0.012, 11.4 + i * 0.012);
-      const tw = 0.55 + 0.45 * Math.sin(t * 7 + l.ph);
-      l.e.setAttribute("opacity", (on * tw).toFixed(3));
-      l.e.setAttribute("fill", l.c);
-      l.e.setAttribute("r", (6 + 3 * beat).toFixed(2));
+    hookRailDraw(seg(t, 0, 1.05, E.out)); hookArrow.setAttribute("opacity", seg(t, 0.95, 1.05));
+    hookNodes.forEach((n) => n.c.setAttribute("r", (t >= n.t0 ? 16 + 10 * decay(t, n.t0, 9) : 0).toFixed(2)));
+    hookUnderDraw(seg(t, 1.3, 1.55, E.io)); hookEnd.setAttribute("r", (14 * seg(t, 1.5, 1.6, E.back)).toFixed(2));
+    [hookRail, hookArrow, hookUnder, hookEnd, ...hookNodes.map((n) => n.c)].forEach((e) => e.setAttribute("visibility", t < T.zoom ? "visible" : "hidden"));
+    startFrameDraw(seg(t, T.start - 0.05, T.start + 0.4, E.io) * (1 - seg(t, T.whip - 0.24, T.whip - 0.04, E.in)));
+    CARDS.forEach((c, i) => {
+      const q = seg(t, c.t0, c.t0 + 0.22, E.back), out = seg(t, 7.32 + i * 0.03, 7.44 + i * 0.03);
+      c.chip.style.opacity = (clamp(q * 2) * (1 - out)).toFixed(3);
+      c.chip.style.transform = `scaleX(${clamp(q).toFixed(3)}) translateY(${(out * 40).toFixed(1)}px)`;
     });
-    const sparkV = t < 1.9 ? 0.4 : lerp(0.9, 0.3, low) + 0.1 * lv;
+    turnUnderDraw(seg(t, T.turn + 0.45, T.turn + 0.75, E.io) * (1 - seg(t, T.swap - 0.1, T.swap)) + seg(t, T.swap + 0.5, T.swap + 0.75, E.io) * (1 - seg(t, 9.15, 9.25)));
+    const tq = seg(t, T.ideal - 0.08, T.ideal + 0.08, E.out), tout = seg(t, 11.32, 11.44);
+    telop.style.transform = `scaleX(${(tq * (1 - tout)).toFixed(3)})`;
+    show(telop, tq > 0 && tout < 1);
+    ticker.style.opacity = (0.7 * seg(t, T.zoom, T.zoom + 0.3) * (1 - seg(t, 12.7, 12.95))).toFixed(3);
+    ticker.style.transform = tf(-((t * 140) % 1500), 0);
+    bug.style.opacity = (seg(t, 0.5, 0.8) * (1 - seg(t, T.lights - 0.2, T.lights))).toFixed(3);
+
+    // --- lights, sparkles, snow, speed lines
+    const lv = seg(t, T.lights, T.lights + 0.4);
+    wire.setAttribute("opacity", (0.8 * lv).toFixed(3));
+    LIGHTS.forEach((l, i) => {
+      const on = seg(t, T.lights + i * 0.01, T.lights + 0.08 + i * 0.01) * (t < T.sweep[0] + 1 ? 1 : 0);
+      const tw = 0.6 + 0.4 * Math.sin(t * 7 + l.ph) + 0.3 * beat;
+      l.e.setAttribute("opacity", clamp(on * tw).toFixed(3)); l.e.setAttribute("fill", l.c);
+      l.halo.setAttribute("opacity", (on * 0.7 * tw).toFixed(3));
+    });
+    const sparkV = lerp(0.85, 0.25, low) * seg(t, 0.1, 0.5);
     SPARK.forEach((q) => {
       const x = ((((q.wx - cam * q.par) % 2400) + 2400) % 2400) - 240;
       const tw = 0.5 + 0.5 * Math.sin(t * 3.1 + q.ph);
       q.e.style.opacity = (sparkV * tw).toFixed(3);
-      q.e.style.transform = tf(x - 20, q.y - 20, ` rotate(${(q.ph * 30 + t * 20).toFixed(1)}deg) scale(${(q.sc * (0.7 + 0.5 * beat)).toFixed(3)})`);
+      q.e.style.transform = tf(x - 20, q.y - 20, ` rotate(${(q.ph * 30 + t * 20).toFixed(1)}deg) scale(${(q.sc * (0.7 + 0.6 * beat)).toFixed(3)})`);
     });
-    const spv = seg(t, 7.75, 8.0) * (1 - seg(t, 10.9, 11.2));
+    const sv = seg(t, T.lights, T.lights + 0.5);
+    SNOW.forEach((f) => {
+      const y = ((f.y + (t - T.lights) * f.v) % 1120) - 20, x = (f.x + Math.sin(t * 1.3 + f.ph) * f.sw - cam * 0.2) % 2000;
+      f.e.setAttribute("cx", (x < 0 ? x + 2000 : x).toFixed(1)); f.e.setAttribute("cy", y.toFixed(1)); f.e.setAttribute("r", f.r);
+      f.e.setAttribute("opacity", (sv * 0.75).toFixed(3));
+    });
+    const spv = seg(t, 9.4, 9.6) * (1 - seg(t, 11.0, 11.3)) + 0.8 * Math.sin(Math.PI * seg(t, 3.6, 3.9));
     SPEED.forEach((l) => {
       const x = 2100 - ((l.x0 + t * l.v) % 2600);
       l.e.setAttribute("d", `M${x} ${l.y} H${x + l.len}`);
-      l.e.setAttribute("opacity", (spv * 0.7).toFixed(3));
-    });
-
-    // --- the turn: stripes sweep across, the colour comes back underneath
-    const wp = seg(t, CUES.turn - 0.34, CUES.turn + 0.34, E.io);
-    wipe.style.display = wp > 0 && wp < 1 ? "" : "none";
-    BARS.forEach((b) => {
-      const x = -500 + (4 - b.i) * 450 + (wp - 0.5) * 5200; // all five cover the frame at the midpoint
-      b.e.style.transform = `translateX(${x.toFixed(1)}px) skewX(-18deg)`;
+      l.e.setAttribute("opacity", (clamp(spv) * 0.7).toFixed(3));
     });
 
     // --- the star sweeps across the lens and wipes to the end card
-    const sw = seg(t, CUES.sweep[0], CUES.sweep[1], E.sine);
-    const stx = lerp(-900, 3000, sw);
-    sweep.style.display = t >= CUES.sweep[0] && t < CUES.sweep[1] ? "" : "none";
+    const sw = seg(t, T.sweep, 13.4, E.sine), stx = lerp(-900, 3000, sw);
+    show(sweep, t >= T.sweep && t < 13.4);
     sweepStar.setAttribute("transform", `translate(${stx.toFixed(1)} 540) rotate(${(sw * 90).toFixed(1)}) scale(14)`);
-    endcard.style.display = t >= CUES.sweep[0] ? "" : "none";
-    endcard.style.clipPath = t >= CUES.sweep[1] ? "none" : `inset(0 ${Math.max(0, 1920 - stx).toFixed(1)}px 0 0)`;
-    $("scene").style.visibility = t >= CUES.sweep[1] ? "hidden" : "visible";
-    endItems.forEach(({ e, t0 }) => {
-      const q = seg(t, t0, t0 + 0.24, E.out);
-      e.style.opacity = q.toFixed(3);
-      e.style.transform = tf(0, (1 - q) * 26);
-    });
-    const wq = seg(t, 13.05, 13.45, E.out);
-    eWoman.style.transform = tf(EW.x - SPR.ax * EW.s - (1 - wq) * 60, EW.y - SPR.ay * EW.s, ` scale(${EW.s})`);
-    eWoman.style.opacity = wq.toFixed(3);
-    const esq = seg(t, 13.42, 13.62, E.back);
-    endStar.style.transform = tf(1800 - 45, 250 - 45, ` scale(${(1.6 * esq).toFixed(3)}) rotate(${(esq * 45).toFixed(1)}deg)`);
+    show(endcard, t >= T.sweep);
+    endcard.style.clipPath = t >= 13.4 ? "none" : `inset(0 ${Math.max(0, 1920 - stx).toFixed(1)}px 0 0)`;
+    main.style.display = t < 13.4 ? "" : "none";
+    renderEnd(t, beat);
 
     gctx.putImageData(GRAIN[Math.floor(t * 30) % 4], 0, 0);
+  }
+  function bumpFlash(t, t0) { // white flash peaking on t0
+    return t < t0 ? seg(t, t0 - 0.05, t0) : 1 - seg(t, t0, t0 + 0.22, E.out);
+  }
+
+  function renderEnd(t, beat) {
+    if (t < T.sweep) { clip2Want = null; return; }
+    END_IN.forEach(({ e, t0 }) => {
+      const q = seg(t, t0, t0 + 0.26, E.out);
+      e.style.opacity = q.toFixed(3);
+      e.style.transform = tf(0, (1 - q) * 28);
+    });
+    const lq = seg(t, 13.2, 13.62, E.out); // the logo opens up, letter-spacing settling
+    EC["e-logo"].style.clipPath = `inset(0 ${(100 - 100 * lq).toFixed(1)}% 0 0)`;
+    EC["e-logo"].style.letterSpacing = (0.06 + 0.12 * (1 - lq)).toFixed(3) + "em";
+    EC["e-kana"].style.opacity = seg(t, 13.5, 13.7).toFixed(3);
+    const cq = seg(t, T.cta - 0.1, T.cta + 0.18, E.back);
+    cta.style.opacity = clamp(cq * 2).toFixed(3);
+    cta.style.transform = `scale(${(cq * (1 + 0.025 * (t > T.cta + 0.3 ? beat : 0))).toFixed(4)})`;
+    ctaArrow.setAttribute("transform", `translate(${(t > T.cta + 0.3 ? 4 * beat : 0).toFixed(2)} 0)`);
+    const rp = t > T.cta + 0.2 ? ((t - T.cta - 0.2) / (2 * BEAT)) % 1 : -1; // a ring pulses out every two beats
+    ctaRing.style.opacity = rp >= 0 ? (0.8 * (1 - rp)).toFixed(3) : 0;
+    ctaRing.style.transform = `scale(${(1 + 0.12 * Math.max(0, rp)).toFixed(4)}, ${(1 + 0.5 * Math.max(0, rp)).toFixed(4)})`;
+    accDraw(seg(t, 13.55, 13.85, E.io));
+    ACC.forEach((a) => {
+      const q = seg(t, 13.6 + a.i * 0.07, 13.8 + a.i * 0.07, E.out);
+      a.c.setAttribute("r", (9 * seg(t, 13.6 + a.i * 0.07, 13.72 + a.i * 0.07, E.back)).toFixed(2));
+      a.sp.style.opacity = q.toFixed(3); a.sp.style.transform = tf(0, (1 - q) * 14);
+    });
+    const bq = seg(t, 13.3, 13.62, E.back);
+    badge.style.opacity = clamp(bq * 2).toFixed(3);
+    badge.style.transform = `rotate(${((1 - bq) * -40).toFixed(2)}deg) scale(${bq.toFixed(3)})`;
+    endStars.forEach((st, i) => {
+      const q = seg(t, 13.5 + i * 0.08, 13.7 + i * 0.08, E.back), tw = 0.85 + 0.15 * Math.sin(t * 5 + i * 2);
+      st.e.style.transform = tf(st.x - 45, st.y - 45, ` scale(${(st.k * q * tw).toFixed(3)}) rotate(${(q * 45 + t * 12).toFixed(1)}deg)`);
+    });
+    // her, still striding, on the end card
+    const wq = seg(t, 13.1, 13.5, E.out);
+    if (CLIP) {
+      const [x0, y0] = CLIP.crop, i = clamp(Math.floor(clipTime(t) * CLIP.fps), 0, CLIP.frames - 1);
+      const drift = CLIP.cx ? CLIP.cx[i] - CLIP.cx[0] : 0;
+      endWrap.style.transform = tf(EW.x - (CLIP.feet[0] - x0 + drift) * VS2 - (1 - wq) * 80, EW.y - (CLIP.feet[1] - y0) * VS2);
+      clip2Want = clipTime(t);
+    } else {
+      const k = EW.h / (SPR.ay - SPR.top);
+      endWrap.style.transform = tf(EW.x - SPR.ax * k - (1 - wq) * 80, EW.y - SPR.ay * k, ` scale(${k.toFixed(4)})`);
+      endWrap.style.transformOrigin = "0 0";
+    }
+    endWrap.style.opacity = wq.toFixed(3);
+    endWrap.style.filter = "drop-shadow(16px 12px 0 rgba(96,8,42,0.3))";
   }
 
   // ---------------------------------------------------------------- footage sync
   const clipFrameTime = (c) => (Math.floor(clamp(c, 0, CLIP.frames / CLIP.fps - 1e-3) * CLIP.fps) + 0.5) / CLIP.fps;
-  function seekClip(c) { // resolves once the requested frame is decoded
+  function seek(v, c) { // resolves once the requested frame is decoded
     return new Promise((res) => {
       const target = clipFrameTime(c);
-      if (Math.abs(clipVid.currentTime - target) < 1e-3 && clipVid.readyState >= 2) return res();
-      clipVid.addEventListener("seeked", () => requestAnimationFrame(() => requestAnimationFrame(res)), { once: true });
-      clipVid.currentTime = target;
+      if (Math.abs(v.currentTime - target) < 1e-3 && v.readyState >= 2) return res();
+      v.addEventListener("seeked", () => requestAnimationFrame(() => requestAnimationFrame(res)), { once: true });
+      v.currentTime = target;
     });
   }
   async function renderAsync(t) {
     render(t);
-    if (CLIP && clipWant != null) await seekClip(clipWant);
-  }
-  function syncClip() { // live playback: let the video run, nudge it back when it drifts
     if (!CLIP) return;
-    if (Math.abs(clipVid.currentTime - clipWant) > 0.1) clipVid.currentTime = clipWant;
-    if (clipVid.paused) clipVid.play().catch(() => {});
+    const jobs = [];
+    if (t < 13.4 && clipWant != null) jobs.push(seek(clipVid, clipWant));
+    if (clip2Want != null) jobs.push(seek(clipVid2, clip2Want));
+    await Promise.all(jobs);
+  }
+  function syncClip() { // live playback: let the videos run, nudge them back when they drift
+    if (!CLIP) return;
+    for (const [v, want] of [[clipVid, clipWant], [clipVid2, clip2Want]]) {
+      if (want == null) { if (!v.paused) v.pause(); continue; }
+      if (Math.abs(v.currentTime - want) > 0.1) v.currentTime = want;
+      if (v.paused) v.play().catch(() => {});
+    }
   }
 
   // ---------------------------------------------------------------- boot
@@ -513,12 +706,12 @@
   const imgs = [...document.images].map((im) => (im.complete ? Promise.resolve() : new Promise((r) => { im.onload = im.onerror = r; })));
   const fonts = ['900 60px "Noto Sans JP"', '700 60px "Noto Sans JP"', '800 30px "Montserrat"', '400 30px "DM Mono"', '500 60px "Cormorant Garamond"']
     .map((f) => document.fonts.load(f, "恋あGOAL Étoile"));
-  const clipReady = !CLIP ? Promise.resolve() : new Promise((r) => {
-    if (clipVid.readyState >= 2) r(); else { clipVid.addEventListener("loadeddata", r, { once: true }); clipVid.addEventListener("error", r, { once: true }); }
+  const vidReady = (v) => new Promise((r) => {
+    if (v.readyState >= 2) r(); else { v.addEventListener("loadeddata", r, { once: true }); v.addEventListener("error", r, { once: true }); }
   });
-  const ready = Promise.all([...imgs, ...fonts, clipReady, document.fonts.ready]);
+  const ready = Promise.all([...imgs, ...fonts, document.fonts.ready, ...(CLIP ? [vidReady(clipVid), vidReady(clipVid2)] : [])]);
   window.MV = { DUR, CUES, render, renderAsync, ready, fps: 30, clip: CLIP && CLIP_NAME,
-    debug: () => ({ st: ST.map((q) => [q.jp, Math.round(q.wx), q.line]), goal: GOAL_X, cam: [0, 1, 2, 5.6, 7.5, 11.25, 12.19, 13].map((t) => [t, Math.round(camX(t))]) }) };
+    debug: () => ({ cam: [0, 1.875, 3.75, 5.6, 7.5, 9.4, 11.25, 13].map((t) => [t, Math.round(camX(t))]), goal: GOAL_X }) };
 
   const still = params.get("t");
   ready.then(() => renderAsync(still != null ? parseFloat(still) : 14));

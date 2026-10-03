@@ -29,12 +29,12 @@ window.KoiAudio = (() => {
     const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
 
     // ---------------------------------------------------------- buses
-    const master = ctx.createGain(); master.gain.value = 1.05;
+    const master = ctx.createGain(); master.gain.value = cues.etoile ? 0.78 : 1.05;
     const hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 28; // DC and sub rumble
     const comp = ctx.createDynamicsCompressor();
     comp.threshold.value = -22; comp.knee.value = 10; comp.ratio.value = 4; comp.attack.value = 0.006; comp.release.value = 0.18;
     const limit = ctx.createDynamicsCompressor();
-    limit.threshold.value = -4; limit.knee.value = 0; limit.ratio.value = 20; limit.attack.value = 0.001; limit.release.value = 0.08;
+    limit.threshold.value = cues.etoile ? -5.5 : -4; limit.knee.value = 0; limit.ratio.value = 20; limit.attack.value = 0.001; limit.release.value = 0.08;
     const fadeOut = ctx.createGain();
     fadeOut.gain.setValueAtTime(1, at(END - 0.06)); fadeOut.gain.linearRampToValueAtTime(0, at(END));
     master.connect(hp).connect(comp).connect(limit).connect(fadeOut).connect(dest);
@@ -54,7 +54,7 @@ window.KoiAudio = (() => {
     const drums = bus(0.8, 0, 0.04), keys = bus(0.95, -0.08, 0.35), gtr = bus(0.2, 0.42, 0.1), bassBus = bus(0.7);
     const bells = bus(0.42, 0.12, 0.9), sfx = bus(0.55, 0, 0.18), pad = bus(0.34, 0, 0.5);
     // the arrangement thins out just before the title lands
-    for (const b of [drums, bassBus, gtr]) {
+    if (!cues.etoile) for (const b of [drums, bassBus, gtr]) {
       b.gain.setValueAtTime(b.gain.value, at(12.15)); b.gain.linearRampToValueAtTime(0, at(12.2));
       b.gain.setValueAtTime(0, at(13.1)); b.gain.linearRampToValueAtTime(b === gtr ? 0 : b.gain.value, at(13.125));
     }
@@ -168,7 +168,58 @@ window.KoiAudio = (() => {
     function rustle(t, dur = 0.14, vel = 1) { noiseHit(t, dur, "bandpass", 2600, 0.6, 0.12 * vel, sfx, 0.02); }
     function click(t, vel = 1) { blip(t, 3200, 2400, 0.018, 0.12 * vel); }
 
+    // ---------------------------------------------------------- Étoile score
+    // D major, 128 BPM, 8 bars: groove from frame 0 (a web spot has no intro to spare),
+    // a drum-less breakdown for the low point, a build, then a chorus with a hook melody.
+    function scoreEtoile(T) {
+      const PR = ["D", "A", "Bm", "G", "D", "A", "Em", "Asus", "D", "A", "Bm", "G", "G", "A", "D", "D"];
+      const MEL = { 8: [81, 0, 78, 81], 9: [83, 81, 76, 0], 10: [78, 0, 81, 83], 11: [86, 83, 81, 0], 12: [83, 81, 78, 81], 13: [90, 0, 88, 86] };
+      const low = (t) => t >= T.low[0] && t < T.low[1], END_T = T.end;
+      for (let h = 0; h < 14; h++) {
+        const c = CH[PR[h]], t = h * 2 * BEAT;
+        if (t >= END_T) break;
+        if (low(t)) { // breakdown: pad and sparse keys, long bass
+          swell(c.ep, t, 2 * BEAT - 0.02, 0.5);
+          for (const n of c.ep.slice(0, 3)) ep(n + 12, t, 0.8, 0.22);
+          bass(c.bass, t, 2 * BEAT * 0.9, 0.6);
+          continue;
+        }
+        const chorus = t >= T.turn;
+        swell(c.ep, t, 2 * BEAT - 0.02, chorus ? 0.5 : 0.35);
+        for (const off of [0, 0.75, 1.5]) for (const n of c.ep) ep(n, t + off * BEAT, off === 1.5 ? 0.42 : 0.26, (chorus ? 0.66 : 0.55) * (off ? 0.8 : 1));
+        for (let e = 0; e < 4; e++) bass(c.bass + (e % 2 && (chorus || t >= 3.75) ? 12 : 0), t + e * BEAT / 2, BEAT / 2 * 0.85, e === 0 ? 1 : 0.78);
+        const pat = [1, 0, 1, 1, 0, 1, 1, 0];
+        for (let k = 0; k < 8; k++) if (pat[k]) mute(c.ep[k % 2 ? 2 : 0] + 12, t + k * BEAT / 4, k % 4 === 0 ? 1 : 0.6);
+        (MEL[h] || []).forEach((n, k) => { if (n) { bell(n, t + k * BEAT / 2, 0.42); ep(n, t + k * BEAT / 2, 0.2, 0.3); } });
+      }
+      for (let b = 0; b < 32; b++) {
+        const t = b * BEAT, inBar = b % 4;
+        if (t >= END_T - 0.47) break; // the last beat before the end card is left open for the riser
+        if (low(t)) { // heartbeat under the low point
+          if (inBar === 0 || inBar === 2) { kick(t, 0.5); kick(t + 0.17, 0.32); }
+          continue;
+        }
+        const chorus = t >= T.turn, busy = chorus || t >= 3.75;
+        kick(t, inBar === 0 ? 1 : 0.88);
+        if (inBar === 1 || inBar === 3) { snare(t, 0.9); clap(t, chorus ? 1 : 0.7); }
+        for (let k = 0; k < (busy ? 4 : 2); k++) hat(t + k * BEAT / (busy ? 4 : 2), k === 0 ? 0.8 : 0.5);
+        if (chorus) hat(t + BEAT / 2, 0.45, true);
+      }
+      for (let k = 0; k < 16; k++) snare(T.turn - 1 + k / 16, 0.25 + k * 0.045);      // build into the turn
+      crash(0, 0.9); crash(T.turn, 1); crash(11.25, 0.7);
+      sweep(END_T - 0.5, 0.5, 300, 6000, 0.14, pad, 0.8);
+      // the end card lands on a bright D(add9), ringing to the last frame
+      kick(END_T, 1); crash(END_T, 0.9);
+      for (const n of CH.D.ep) ep(n, END_T, END - END_T, 0.62, keys, 0.06);
+      for (const n of [74, 78, 81]) ep(n, END_T, END - END_T, 0.36, keys, 0.06);
+      swell([50, 54, 57, 62, 64, 69], END_T, END - END_T + 0.2, 0.95);
+      bass(38, END_T, 1.8, 1);
+      [81, 86, 88, 90, 93].forEach((n, i) => bell(n, END_T + 0.06 + i * 0.08, 0.45));
+    }
+
     // ---------------------------------------------------------- music
+    if (cues.etoile) scoreEtoile(cues.etoile);
+    else {
     // intro: a soft chord swell under the opening line
     swell([55, 59, 62, 66], 0.0, 1.85, 0.85);
     ep(74, 0.12, 0.5, 0.45); ep(78, 0.6, 0.5, 0.4); ep(81, 1.05, 0.6, 0.35);
@@ -223,17 +274,39 @@ window.KoiAudio = (() => {
     bass(38, 13.125, 1.8, 1);
     [81, 86, 88, 90, 93].forEach((n, i) => bell(n, 13.2 + i * 0.09, 0.5));
 
+    }
+
     if (cues.etoile) {
-      // ------------------------------------------------------- Étoile cues
-      const T = cues.etoile, NOTES = [74, 76, 78, 81, 83, 86, 88, 90, 93];
-      for (let i = 0; i < 26; i++) noiseHit(0.12 + i * 0.03, 0.016, "highpass", 3000, 1, 0.12, sfx);  // opening line types in
-      blip(0.45, 700, 1400, 0.1, 0.14);                                                          // START
-      for (let t = T.enter + 0.2; t < 13.0; t += BEAT) step(t, T.low && t > T.low[0] && t < T.low[1] ? 0.55 : 0.8);
-      T.title.forEach((t, i) => { blip(t, 420 - i * 40, 200, 0.12, 0.2, sfx, "triangle"); noiseHit(t, 0.06, "bandpass", 2000, 1, 0.14, sfx); });
-      T.stations.forEach((t, i) => { bell(NOTES[i % NOTES.length] - (T.low && t > T.low[0] ? 5 : 0), t, 0.8); click(t, 1); });
-      sweep(T.turn - 0.35, 0.42, 500, 5200, 0.2);                                                // stripes wipe into the turn
-      for (let i = 0; i < 6; i++) bell(86 + [0, 2, 4, 7, 9, 12][i], T.goal + i * 0.05, 0.35);     // GOAL sparkle
-      sweep(T.end - 0.3, 0.4, 900, 5200, 0.18);
+      // Étoile: sound design for every cut and graphic (the score is scoreEtoile above)
+      const T = cues.etoile;
+      const hit = (t, v = 1) => { blip(t, 140, 48, 0.24, 0.5 * v); noiseHit(t, 0.07, "bandpass", 1800, 0.8, 0.22 * v, sfx); };
+      const impact = (t, v = 1) => { crash(t, v); kick(t, 1.2 * v); blip(t, 75, 32, 0.7, 0.55 * v); noiseHit(t, 0.35, "lowpass", 1400, 0.7, 0.3 * v, sfx); };
+      T.hook.forEach((t, i) => hit(t, i === 1 ? 1.25 : 0.9));
+      sweep(T.zoom - 0.42, 0.44, 400, 7000, 0.3);                                    // zoom through 痩せて
+      impact(T.zoom, 0.9);
+      [90, 86, 90, 86].forEach((n, i) => bell(n, T.start + i * 0.2, 0.55 - i * 0.06)); // departure chime
+      for (let i = 0; i < 30; i++) noiseHit(T.typeTop[0] + i * ((T.typeTop[1] - T.typeTop[0]) / 30), 0.014, "highpass", 3200, 1, 0.1, sfx);
+      T.stations.forEach((t, i) => { bell([81, 78][i % 2], t, 0.6); click(t, 1); });
+      sweep(T.whip - 0.05, 0.3, 300, 4200, 0.32); hit(T.whip + 0.13, 0.7);           // whip pan to the board
+      T.rows.forEach((t) => {                                                       // split-flap rattle, then the clack
+        for (let k = 0; k < 9; k++) noiseHit(t - 0.2 + k * 0.022, 0.008, "highpass", 2600 + k * 120, 1.2, 0.16, sfx);
+        click(t + 0.02, 1.4); blip(t + 0.02, 900, 600, 0.04, 0.08);
+      });
+      sweep(T.boardOut - 0.05, 0.3, 3600, 300, 0.22);
+      T.cards.forEach((t, i) => { swell([45 + i * 2, 52, 57], t, 0.9, 0.5); bell([69, 66, 64][i], t, 0.45); });
+      sweep(T.turn - 0.9, 0.9, 250, 7500, 0.28, sfx, 0.9);                          // riser into the turn
+      impact(T.turn, 1.15); noiseHit(T.turn, 0.5, "highpass", 4000, 0.5, 0.18, sfx); // white flash
+      hit(T.turn + 0.23, 0.8); hit(T.swap, 0.9); hit(T.swap + 0.23, 0.7);
+      sweep(T.pull, 0.42, 1800, 400, 0.22);                                         // pull back out of the close-up
+      [86, 90, 93].forEach((n, i) => bell(n, T.next + i * 0.06, 0.4)); hit(T.ideal, 1);
+      T.feats.forEach((t, i) => { blip(t, 520 + i * 90, 1250 + i * 160, 0.09, 0.2, sfx, "triangle"); bell([78, 81, 83, 86][i], t, 0.6); click(t, 1); });
+      for (let i = 0; i < 10; i++) bell(86 + [0, 2, 4, 7, 9, 12, 14, 16, 19, 21][i], T.lights + i * 0.045, 0.22); // lights on
+      impact(T.goal, 0.6); [86, 90, 93, 98].forEach((n, i) => bell(n, T.goal + i * 0.03, 0.55));
+      sweep(T.goal + 0.1, 0.8, 2000, 9000, 0.08);
+      const w = sweep(T.sweep - 0.06, 0.62, 350, 2600, 0.36, sfx, 0.7);             // the star crosses the lens
+      const pan = ctx.createStereoPanner(); w.disconnect(); w.connect(pan).connect(sfx);
+      pan.pan.setValueAtTime(-0.9, at(T.sweep - 0.06)); pan.pan.linearRampToValueAtTime(0.9, at(T.sweep + 0.56));
+      blip(T.cta, 660, 1320, 0.08, 0.22, sfx, "triangle"); bell(93, T.cta + 0.04, 0.5); bell(98, T.cta + 0.12, 0.35); // CTA
     } else if (cues.making) {
       // ------------------------------------------------------- making-of cues
       const M = cues.making, NOTES = [74, 76, 78, 81, 83, 86, 88];
