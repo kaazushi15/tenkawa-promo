@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>H3 Making Of</title>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<style>
+:root{--ink:#141414;--paper:#efefed;--yellow:#ffe834;--min:'Shippori Mincho',serif;--goth:'Zen Kaku Gothic New',sans-serif;--en:'Josefin Sans',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:2160px;height:2000px;overflow:hidden;background:var(--paper)}
+#stage{position:relative;width:2160px;height:2000px;overflow:hidden;background:var(--paper);color:var(--ink);font-family:var(--goth);-webkit-font-smoothing:antialiased}
+.sc{position:absolute;inset:0;visibility:hidden}
+.pane{position:absolute;overflow:hidden;box-shadow:0 14px 50px rgba(0,0,0,.10);background:#ddd}
+.pane img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover}
+/* step header: big and readable */
+.head{position:absolute;left:96px;top:70px}
+.head .s{font-family:var(--en);font-size:40px;letter-spacing:.24em;font-weight:600;color:#a89500}
+.head .t{font-size:84px;font-weight:700;letter-spacing:.04em;margin-top:8px}
+.head .tool{display:inline-block;margin-top:18px;font-size:34px;font-weight:500;color:#333;background:#fff;border-radius:999px;padding:10px 30px;box-shadow:0 4px 18px rgba(0,0,0,.06)}
+.head .tool b{font-weight:700}
+.arrow{position:absolute;font-family:var(--en);font-size:80px;font-weight:300;color:#999}
+/* title */
+#t0 .mk{position:absolute;left:0;width:2160px;top:700px;text-align:center;font-family:var(--en);font-size:180px;letter-spacing:.32em;font-weight:300;padding-left:.32em}
+#t0 .rule{position:absolute;left:780px;top:930px;width:600px;height:3px;background:var(--yellow);transform-origin:center}
+#t0 .sub{position:absolute;left:0;width:2160px;top:980px;text-align:center;font-family:var(--min);font-size:68px;letter-spacing:.12em;font-weight:500}
+#t0 .flow{position:absolute;left:0;width:2160px;top:1160px;text-align:center;font-size:44px;font-weight:500;letter-spacing:.06em;color:#333}
+#t0 .flow span{display:inline-block;margin:0 12px}
+#t0 .flow i{font-style:normal;color:#aaa;margin:0 8px}
+/* step 1 */
+#t1 .src{left:96px;top:420px;width:810px;height:1440px}
+.box{position:absolute;border:6px solid var(--yellow)}
+.bn{position:absolute;width:56px;height:56px;border-radius:50%;background:var(--yellow);font-family:var(--en);font-size:28px;font-weight:600;display:flex;align-items:center;justify-content:center}
+#t1 .rows{position:absolute;left:1100px;top:420px;width:960px}
+#t1 .row{position:relative;height:156px;display:flex;align-items:center;gap:30px;border-bottom:1px solid #d6d6d2}
+#t1 .row .thumb{width:76px;height:136px;border-radius:8px;overflow:hidden;flex:none;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+#t1 .row .thumb img{width:100%;height:100%;object-fit:cover}
+#t1 .row .num{width:56px;height:56px;border-radius:50%;background:var(--yellow);font-family:var(--en);font-size:28px;font-weight:600;display:flex;align-items:center;justify-content:center;flex:none}
+#t1 .row .nm{font-size:44px;font-weight:700;letter-spacing:.04em;width:330px}
+#t1 .row .sec{font-family:var(--en);font-size:34px;color:#666;letter-spacing:.06em}
+/* step 2 */
+#t2 .colh{position:absolute;top:420px;font-size:36px;font-weight:700;letter-spacing:.04em;text-align:center}
+#t2 .row{position:absolute;left:96px;width:1968px;height:420px}
+#t2 .tiny{position:absolute;left:0;top:0;width:420px;height:420px;background:#fff;border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(0,0,0,.06)}
+#t2 .tiny img{image-rendering:auto;box-shadow:0 0 0 2px #ccc}
+#t2 .tiny .px{position:absolute;bottom:22px;left:0;width:100%;text-align:center;font-family:var(--en);font-size:30px;color:#888;letter-spacing:.06em}
+#t2 .big{position:absolute;top:0;width:640px;height:420px;border-radius:16px}
+#t2 .b1{left:560px} #t2 .b2{left:1328px}
+#t2 .stamp{position:absolute;right:20px;top:20px;font-size:32px;font-weight:700;letter-spacing:.06em;padding:8px 22px;border-radius:999px}
+#t2 .ng{background:#111;color:#fff} #t2 .ok{background:var(--yellow);color:#111}
+#t2 .arr1{left:452px;top:150px} #t2 .arr2{left:1220px;top:150px}
+#t2 .lab{position:absolute;left:0;top:-58px;font-size:34px;font-weight:700;letter-spacing:.06em}
+/* step 3 */
+.card{position:absolute;width:900px;height:620px;background:#fff;border-radius:24px;box-shadow:0 10px 40px rgba(0,0,0,.07);overflow:hidden}
+.card .no{position:absolute;left:40px;top:34px;font-family:var(--en);font-size:44px;font-weight:600;color:#a89500}
+.card .tt{position:absolute;left:120px;top:30px;font-size:46px;font-weight:700;letter-spacing:.04em}
+.card .chip{position:absolute;left:122px;top:100px;font-family:var(--en);font-size:28px;letter-spacing:.06em;color:#555}
+.card .body{position:absolute;left:40px;right:40px;top:170px;bottom:36px}
+#c1{left:96px;top:440px} #c2{left:1164px;top:440px} #c3{left:96px;top:1150px} #c4{left:1164px;top:1150px}
+#t3 .a12{left:1020px;top:690px} #t3 .a23{left:1050px;top:1040px;transform:rotate(135deg)} #t3 .a34{left:1020px;top:1400px}
+/* c1 html */
+#c1 .wire{position:absolute;left:0;top:0;width:250px;height:420px;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.12)}
+#c1 .wire img{width:100%;height:100%;object-fit:cover}
+#c1 .guide{position:absolute;border:3px dashed #e0b400}
+#c1 .code{position:absolute;left:290px;top:0;right:0;height:420px;background:#151515;border-radius:12px;padding:26px 28px;font-family:'DejaVu Sans Mono',monospace;font-size:22px;line-height:1.6;color:#ddd;white-space:pre;overflow:hidden}
+#c1 .code .k{color:#ffe834} #c1 .code .s{color:#b8e3a0}
+/* c2 timeline */
+#c2 .tl{position:absolute;left:0;top:40px;width:820px;height:80px;display:flex;gap:4px}
+#c2 .tl div{height:80px;border-radius:8px;background:#e6e6e2;font-family:var(--en);font-size:17px;display:flex;align-items:center;justify-content:center;color:#555;overflow:hidden}
+#c2 .ph{position:absolute;top:10px;width:5px;height:140px;background:#111}
+#c2 .tc{position:absolute;left:0;top:0;font-family:var(--en);font-size:28px;letter-spacing:.1em}
+#c2 .fx{position:absolute;left:0;top:200px;width:820px;display:flex;flex-wrap:wrap;gap:14px}
+#c2 .fx span{font-size:28px;font-weight:500;background:#f4f4f3;border-radius:999px;padding:8px 22px}
+#c2 .fx span b{font-family:var(--en);font-weight:600}
+/* c3 frames */
+#c3 .strip{position:absolute;left:0;top:10px;display:flex;gap:14px}
+#c3 .strip div{width:118px;height:210px;border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+#c3 .strip img{width:100%;height:100%;object-fit:cover}
+#c3 .cnt{position:absolute;left:0;top:260px;font-family:var(--en);font-size:44px;letter-spacing:.08em}
+#c3 .cnt small{font-size:28px;color:#777;margin-left:16px}
+/* c4 mp4 */
+#c4 .vid{position:absolute;left:0;top:0;width:236px;height:420px;border-radius:14px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.15)}
+#c4 .vid img{width:100%;height:100%;object-fit:cover}
+#c4 .spec{position:absolute;left:290px;top:20px;font-size:38px;line-height:1.75;font-weight:500}
+#c4 .spec b{font-family:var(--en);font-weight:600}
+/* final */
+#t4 .lab{position:absolute;top:34px;display:flex;align-items:baseline;gap:22px}
+#t4 .lab .k{font-family:var(--en);font-size:30px;letter-spacing:.22em;font-weight:600}
+#t4 .lab .j{font-size:30px;letter-spacing:.06em;font-weight:500;color:#333}
+</style>
+</head>
+<body>
+<div id="stage">
+
+<section class="sc" id="t0">
+  <div class="mk" id="t0mk">MAKING OF</div>
+  <div class="rule" id="t0rule"></div>
+  <div class="sub" id="t0sub">画像1枚から、LPモーションへ。</div>
+  <div class="flow" id="t0flow"><span>① 画像から構成</span><i>→</i><span>② 崩れる写真は再生成</span><i>→</i><span>③ コードで動かす</span></div>
+</section>
+
+<section class="sc" id="t1">
+  <div class="head"><div class="s">STEP 1</div><div class="t">画像を読み取って、構成をつくる</div><div class="tool"><b>Claude Code</b> がLPを9つの場面に分け、縦型動画の構成表に</div></div>
+  <div class="pane src"><img src="../assets/source.png"></div>
+  <div id="t1boxes" style="position:absolute;left:96px;top:420px;width:810px;height:1440px;overflow:hidden"></div>
+  <div class="rows" id="t1rows"></div>
+</section>
+
+<section class="sc" id="t2">
+  <div class="head"><div class="s">STEP 2</div><div class="t">小さくて崩れる写真は、作り直す</div><div class="tool">再生成：<b>Runway（Nano Banana Pro）</b>　同じモデル・同じ雰囲気で高解像度に</div></div>
+  <div class="colh" style="left:96px;width:420px">元画像の写真（実寸）</div>
+  <div class="colh" style="left:656px;width:640px">AIでそのまま拡大</div>
+  <div class="colh" style="left:1424px;width:640px">再生成</div>
+  <div class="row" style="top:510px"><div class="tiny"><img src="frames/tiny_v1.png" width="167" height="148"><div class="px">167 × 148 px</div></div><div class="arrow arr1">→</div><div class="pane big b1"><img src="../assets/img/v1.jpg"><div class="stamp ng">ぼやける・崩れる</div></div><div class="arrow arr2">→</div><div class="pane big b2"><img src="../assets/gen2/v1.jpg" style="object-position:50% 45%"><div class="stamp ok">くっきり</div></div></div>
+  <div class="row" style="top:970px"><div class="tiny"><img src="frames/tiny_profile.png" width="376" height="250"><div class="px">376 × 250 px</div></div><div class="arrow arr1">→</div><div class="pane big b1"><img src="../assets/img/profile.jpg" style="object-position:50% 30%"><div class="stamp ng">ぼやける・崩れる</div></div><div class="arrow arr2">→</div><div class="pane big b2"><img src="../assets/gen2/profile.jpg" style="object-position:50% 38%"><div class="stamp ok">くっきり</div></div></div>
+  <div class="row" style="top:1430px"><div class="tiny"><img src="frames/tiny_step2.png" width="148" height="52"><div class="px">148 × 52 px</div></div><div class="arrow arr1">→</div><div class="pane big b1"><img src="../assets/img/step2.jpg"><div class="stamp ng">ぼやける・崩れる</div></div><div class="arrow arr2">→</div><div class="pane big b2"><img src="../assets/gen2/step2.jpg" style="object-position:50% 40%"><div class="stamp ok">くっきり</div></div></div>
+</section>
+
+<section class="sc" id="t3">
+  <div class="head"><div class="s">STEP 3</div><div class="t">アニメーションは、コードで書いて書き出す</div><div class="tool">動画編集ソフトは使わず、<b>ブラウザ</b>で動きを作って <b>1フレームずつ撮影</b></div></div>
+  <div class="card" id="c1"><div class="no">01</div><div class="tt">画面をつくる</div><div class="chip">HTML / CSS ・ Web fonts ・ SVG logo</div>
+    <div class="body"><div class="wire"><img src="frames/prev/p2.jpg"></div><div class="guide" id="g1" style="left:14px;top:40px;width:120px;height:60px"></div><div class="guide" id="g2" style="left:14px;top:110px;width:170px;height:90px"></div>
+      <div class="code" id="c1code">&lt;div class="hl"&gt;
+  シリコンを、
+  選び直す。
+&lt;/div&gt;
+<span class="k">.hl</span>{ font-family:
+  <span class="s">'Shippori Mincho'</span>;
+  font-size: 80px;
+  letter-spacing: .12em; }</div></div></div>
+  <div class="arrow a12">→</div>
+  <div class="card" id="c2"><div class="no">02</div><div class="tt">動きをつける</div><div class="chip">JavaScript タイムライン ・ WebGL</div>
+    <div class="body"><div class="tc" id="c2tc">00:00.00</div><div class="tl" id="c2tl"></div><div class="ph" id="c2ph"></div>
+      <div class="fx"><span>文字のフェード</span><span>ディゾルブ</span><span>光漏れ</span><span>ページ送り</span><span>髪の揺れ <b>WebGL</b></span></div></div></div>
+  <div class="arrow a23">→</div>
+  <div class="card" id="c3"><div class="no">03</div><div class="tt">1フレームずつ撮影</div><div class="chip">Playwright（自動操作のブラウザ）</div>
+    <div class="body"><div class="strip" id="c3strip"></div><div class="cnt" id="c3cnt">0000 / 2100<small>frames · 60fps</small></div></div></div>
+  <div class="arrow a34">→</div>
+  <div class="card" id="c4"><div class="no">04</div><div class="tt">動画に書き出し</div><div class="chip">ffmpeg ・ BGM: Lyria 3 Pro</div>
+    <div class="body"><div class="vid"><img id="c4img" src="frames/final/f_001.jpg"></div><div class="spec"><b>1080 × 1920</b><br><b>60fps</b> ・ 約36秒<br>BGMを尺に合わせて調整</div></div></div>
+</section>
+
+<section class="sc" id="t4">
+  <div class="lab" style="left:28px"><span class="k">INPUT</span><span class="j">MiniMaxのLPデザイン（画像1枚）</span></div>
+  <div class="lab" style="left:1096px"><span class="k">OUTPUT</span><span class="j">Claude Codeで制作したLPモーション</span></div>
+  <div class="pane" id="t4l" style="left:26px;top:125px;width:1040px;height:1849px"><img src="../assets/source.png"></div>
+  <div class="pane" id="t4r" style="left:1094px;top:125px;width:1040px;height:1849px"><img id="t4img" src="frames/final/f_001.jpg"></div>
+</section>
+
+</div>
+<script>
+const $ = s => document.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), lerp = (a, b, k) => a + (b - a) * k, P = (t, a, d) => clamp((t - a) / d);
+const E = { o3: x => 1 - (1 - x) ** 3, o4: x => 1 - (1 - x) ** 4, io3: x => x < .5 ? 4 * x ** 3 : 1 - (-2 * x + 2) ** 3 / 2 };
+const op = (el, o) => el.style.opacity = o;
+function rise(el, t, a, d = .6, dist = 30) { const k = E.o4(P(t, a, d)); el.style.opacity = k; el.style.transform = `translate3d(0,${(1 - k) * dist}px,0)`; return k; }
+
+const W = { t0: [0, 2.6], t1: [2.2, 7.6], t2: [7.2, 12.6], t3: [12.2, 17.6], t4: [17.2, 20] };
+const END = 20.0;
+function win(id, t) { const [a, b] = W[id]; const el = document.getElementById(id); const v = t >= a && t < b; el.style.visibility = v ? 'visible' : 'hidden'; if (v) el.style.opacity = E.io3(P(t, a, .45)) * (b >= END ? 1 : 1 - E.io3(P(t, b - .45, .45))); return v; }
+
+const SC = [['イントロ', '0–2s', 1, [40, 70, 280, 200]], ['KV', '2–8s', 2, [0, 0, 1125, 420]], ['コンセプト', '8–12s', 3, [0, 420, 1125, 680]], ['製品', '12–17s', 4, [0, 680, 1125, 958]],
+  ['3つの価値', '17–22s', 5, [0, 958, 1125, 1115]], ['サイエンス', '22–27s', 6, [0, 1115, 1125, 1315]], ['使い方', '27–30s', 8, [0, 1315, 1125, 1490]], ['比較', '30–32s', 9, [0, 1618, 1125, 1718]], ['締め', '32–36s', 11, [0, 1848, 1125, 2000]]];
+const SEGS = [['INTRO', 2.2], ['KV', 5.6], ['CONCEPT', 4.6], ['PRODUCT', 4.4], ['VALUES', 5.6], ['SCIENCE', 4.4], ['HOW TO', 3.4], ['VS', 2.0], ['END', 3.8]];
+
+function build() {
+  const bx = $('#t1boxes'), rows = $('#t1rows'), sx = 810 / 1125, sy = 1440 / 2000;
+  SC.forEach(([nm, sec, img, [x0, y0, x1, y1]], i) => {
+    const b = document.createElement('div'); b.className = 'box'; Object.assign(b.style, { left: `${x0 * sx}px`, top: `${y0 * sy}px`, width: `${(x1 - x0) * sx}px`, height: `${(y1 - y0) * sy}px` });
+    const n = document.createElement('div'); n.className = 'bn'; n.textContent = i + 1; Object.assign(n.style, { left: `${x1 * sx - 70}px`, top: `${y0 * sy + 8}px` });
+    bx.append(b, n);
+    const r = document.createElement('div'); r.className = 'row';
+    r.innerHTML = `<div class="num">${i + 1}</div><div class="nm">${nm}</div><div class="thumb"><img src="frames/prev/p${img}.jpg"></div><div class="sec">${sec}</div>`;
+    rows.appendChild(r);
+  });
+  const tl = $('#c2tl'); SEGS.forEach(([n, d]) => { const e = document.createElement('div'); e.style.width = `${d / 36.2 * 820 - 4}px`; e.textContent = n; tl.appendChild(e); });
+  const st = $('#c3strip'); for (let i = 1; i <= 6; i++) { const d = document.createElement('div'); d.innerHTML = `<img src="frames/prev/p${i * 2 - 1}.jpg">`; st.appendChild(d); }
+}
+
+function draw(t) {
+  if (win('t0', t)) {
+    const k = E.o4(P(t, .2, 1.0)); $('#t0mk').style.opacity = k; $('#t0mk').style.letterSpacing = `${lerp(.6, .32, k)}em`;
+    $('#t0rule').style.transform = `scaleX(${E.io3(P(t, .6, .8))})`;
+    rise($('#t0sub'), t, .7, .8, 24); rise($('#t0flow'), t, 1.2, .8, 20);
+  }
+  if (win('t1', t)) {
+    rise($('#t1 .head'), t, 2.3, .6, 20);
+    const s = $('#t1 .src'); s.style.transform = `translate3d(${(1 - E.o4(P(t, 2.4, .8))) * -60}px,0,0)`;
+    const kids = [...$('#t1boxes').children], rows = [...$('#t1rows').children];
+    SC.forEach((_, i) => {
+      const a = 3.0 + i * .42;
+      const k = E.o4(P(t, a, .45)); op(kids[i * 2], k); op(kids[i * 2 + 1], k); kids[i * 2 + 1].style.transform = `scale(${lerp(.5, 1, E.o4(P(t, a, .35)))})`;
+      rise(rows[i], t, a + .1, .5, 24);
+      const on = t >= a && t < a + .42 + (i === SC.length - 1 ? 9 : 0);
+      kids[i * 2].style.boxShadow = on ? '0 0 0 2000px rgba(20,20,20,.28)' : 'none'; kids[i * 2].style.zIndex = on ? 2 : 1;
+      rows[i].style.background = on ? 'rgba(255,232,52,.25)' : 'transparent';
+    });
+  }
+  if (win('t2', t)) {
+    rise($('#t2 .head'), t, 7.3, .6, 20); $$('#t2 .colh').forEach((c, i) => rise(c, t, 7.6 + i * .15, .5, 14));
+    $$('#t2 .row').forEach((r, i) => {
+      const a = 7.9 + i * 1.15;
+      rise(r.querySelector('.tiny'), t, a, .5, 20);
+      const [ar1, ar2] = r.querySelectorAll('.arrow'); rise(ar1, t, a + .3, .4, 0); rise(ar2, t, a + .75, .4, 0);
+      const b1 = r.querySelector('.b1'), b2 = r.querySelector('.b2');
+      const k1 = rise(b1, t, a + .35, .5, 20); b1.querySelector('img').style.transform = `scale(${lerp(1.12, 1.02, k1)})`;
+      const k2 = rise(b2, t, a + .8, .5, 20); b2.querySelector('img').style.transform = `scale(${lerp(1.12, 1.02, k2)})`;
+      const s1 = b1.querySelector('.stamp'), s2 = b2.querySelector('.stamp');
+      const q1 = E.o4(P(t, a + .55, .3)), q2 = E.o4(P(t, a + 1.0, .3));
+      op(s1, q1); s1.style.transform = `scale(${lerp(1.4, 1, q1)})`; op(s2, q2); s2.style.transform = `scale(${lerp(1.4, 1, q2)})`;
+    });
+  }
+  if (win('t3', t)) {
+    rise($('#t3 .head'), t, 12.3, .6, 20);
+    ['#c1', '#c2', '#c3', '#c4'].forEach((c, i) => rise($(c), t, 12.6 + i * .9, .6, 30));
+    $$('#t3 .arrow').forEach((a, i) => op(a, E.o3(P(t, 13.2 + i * .9, .4))));
+    op($('#g1'), E.o3(P(t, 12.9, .4))); op($('#g2'), E.o3(P(t, 13.1, .4)));
+    const vt = lerp(0, 35.9, E.io3(P(t, 13.6, 3.6)));
+    $('#c2ph').style.left = `${vt / 36.2 * 820}px`;
+    $('#c2tc').textContent = `00:${String(Math.floor(vt)).padStart(2, '0')}.${String(Math.floor((vt % 1) * 100)).padStart(2, '0')}`;
+    [...$('#c2tl').children].forEach((e, i) => { const a = SEGS.slice(0, i).reduce((s, x) => s + x[1], 0); e.style.background = vt >= a ? (vt < a + SEGS[i][1] ? '#ffe834' : '#d4d4ce') : '#e6e6e2'; });
+    const fk = P(t, 14.5, 2.6);
+    [...$('#c3strip').children].forEach((d, i) => { const k = E.o4(P(t, 14.5 + i * .3, .4)); d.style.opacity = k; d.style.transform = `translate3d(${(1 - k) * 40}px,0,0)`; });
+    $('#c3cnt').innerHTML = `${String(Math.round(fk * 2100)).padStart(4, '0')} / 2100<small>frames · 60fps</small>`;
+    const f = Math.min(156, Math.max(1, 1 + Math.floor((t - 15.3) * 60))); const src = `frames/final/f_${String(f).padStart(3, '0')}.jpg`; if (!$('#c4img').src.endsWith(src)) $('#c4img').src = src;
+  }
+  if (win('t4', t)) {
+    const k = E.o4(P(t, 17.3, .8));
+    $('#t4l').style.transform = `translate3d(${(1 - k) * -60}px,0,0)`; $('#t4r').style.transform = `translate3d(${(1 - k) * 60}px,0,0)`;
+    const f = Math.min(156, Math.max(1, 1 + Math.floor((t - 17.3) * 60))); const src = `frames/final/f_${String(f).padStart(3, '0')}.jpg`; if (!$('#t4img').src.endsWith(src)) $('#t4img').src = src;
+  }
+}
+async function boot() {
+  build();
+  const srcs = [...Array(156)].map((_, i) => `frames/final/f_${String(i + 1).padStart(3, '0')}.jpg`).concat([...Array(11)].map((_, i) => `frames/prev/p${i + 1}.jpg`));
+  window.__pre = await Promise.all(srcs.map(s => new Promise(r => { const i = new Image(); i.onload = i.onerror = () => r(i); i.src = s; })));
+  await Promise.all($$('img').map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; })));
+  await document.fonts.ready;
+  window.READY = true;
+  if (!/render/.test(location.search)) { const t0 = performance.now(); const tick = () => { draw(((performance.now() - t0) / 1000) % END); requestAnimationFrame(tick); }; tick(); } else draw(0);
+}
+window.render = async t => { draw(t); await Promise.all($$('img').map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; }))); };
+window.END = END;
+boot();
+</script>
+</body>
+</html>
