@@ -31,7 +31,7 @@ USER VOICE と FAQ は25秒に収めるため外した。
 - **ボトル**: rembg（isnet）で切り抜き、ポンプ部分は手動マスクで補正。ラベルの小さい文字は元画像だと潰れて読めないため、同じ文言（SILICONE SHAMPOO／300mL / 10.1 fl.oz）をテキストとして重ねている。
 - **背景プレート**: 製品シーンの水面背景と OLD/NEW の液滴テクスチャはAI生成（文字なし）。
 - **文字**: 文言はすべて元デザインから一字一句そのまま。Webフォント（Shippori Mincho／Zen Kaku Gothic New／Josefin Sans／Cormorant Garamond）で組み直しているので、拡大してもにじまない。H3ロゴは元デザインの形を測ってSVGで描き直した。
-- **音（v3）**: いただいたLyria 3のBGM（`assets/audio/bgm_lyria.mp3`、30.8秒）を、音程を変えずに1.12倍の長さに引き伸ばし、ブツ切れだった終わりに残響の余韻を付けて使用（`src/fit_bgm.py`）。効果音なし。合成版の予備は `src/audio_v3.py`。
+- **音（v3）**: いただいた Lyria 3 Pro のBGM（`assets/audio/bgm_lyria_pro.mp3`、33.3秒）を、音程を変えずに1.085倍に伸ばして映像の尺（約36秒）に合わせて使用（`src/fit_bgm.py`）。効果音なし。合成版の予備は `src/audio_v3.py`。
 
 ## 再レンダリング
 
