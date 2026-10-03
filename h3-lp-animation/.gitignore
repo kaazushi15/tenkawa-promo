@@ -1,0 +1,7 @@
+node_modules/
+assets/source_4x.png
+out/stills/
+out/seg*
+out/*.log
+out/segs.txt
+out/h3_lp_motion_silent.mp4
